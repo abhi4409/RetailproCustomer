@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "955367049370",
+    "project_id": "retailpro-5609c",
+    "storage_bucket": "retailpro-5609c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955367049370:android:d9f02402488d767ccf7723",
+        "android_client_info": {
+          "package_name": "com.example.retailpro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBa61sxxxdEB6AF0c_rhcnFLCiUAbmv0nc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955367049370:android:bfb712960dd4d9a8cf7723",
+        "android_client_info": {
+          "package_name": "com.example.retailprocustomer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBa61sxxxdEB6AF0c_rhcnFLCiUAbmv0nc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955367049370:android:be6c7677653985a1cf7723",
+        "android_client_info": {
+          "package_name": "com.example.retailprostaff"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBa61sxxxdEB6AF0c_rhcnFLCiUAbmv0nc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
