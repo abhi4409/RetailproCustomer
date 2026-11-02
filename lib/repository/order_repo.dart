@@ -1,11 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../services/order_service.dart';
+
 class OrderRepository {
-  final OrderServices _services = OrderServices();
+  final OrderServices _services =
+  OrderServices();
+
   User? getCurrentUser() {
     return _services.getCurrentUser();
   }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> cartStream(
       String uid,
       ) {
@@ -13,6 +18,7 @@ class OrderRepository {
       uid,
     );
   }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> orderStream(
       String uid,
       ) {
@@ -55,7 +61,7 @@ class OrderRepository {
 
   Future<void> updateCartQty(
       String id,
-      int qty,
+      double qty,
       ) async {
     await _services.updateCartQty(
       id,
@@ -70,6 +76,7 @@ class OrderRepository {
       id,
     );
   }
+
   Future<QuerySnapshot<Map<String, dynamic>>> getCart(
       String uid,
       ) async {

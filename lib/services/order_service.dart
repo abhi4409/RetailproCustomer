@@ -18,52 +18,105 @@ class OrderServices {
     return FirebaseAuth.instance.currentUser;
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> cartStream(String uid) {
-    return cart.where('uid', isEqualTo: uid).snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> cartStream(
+      String uid,
+      ) {
+    return cart
+        .where(
+      'uid',
+      isEqualTo: uid,
+    )
+        .snapshots();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> orderStream(String uid) {
-    return orders.where('uid', isEqualTo: uid).snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> orderStream(
+      String uid,
+      ) {
+    return orders
+        .where(
+      'uid',
+      isEqualTo: uid,
+    )
+        .snapshots();
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> orderDetailsStream(
       String orderId,
       ) {
-    return orders.doc(orderId).snapshots();
+    return orders
+        .doc(orderId)
+        .snapshots();
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getAddresses(String uid) async {
-    return await addresses.where('uid', isEqualTo: uid).get();
+  Future<QuerySnapshot<Map<String, dynamic>>> getAddresses(
+      String uid,
+      ) async {
+    return await addresses
+        .where(
+      'uid',
+      isEqualTo: uid,
+    )
+        .get();
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getCustomerDetails(
       String email,
       ) async {
-    return await details.where('email', isEqualTo: email).get();
+    return await details
+        .where(
+      'email',
+      isEqualTo: email,
+    )
+        .limit(1)
+        .get();
   }
 
-  Future<void> createOrder(Map<String, dynamic> data) async {
+  Future<void> createOrder(
+      Map<String, dynamic> data,
+      ) async {
     var ref = orders.doc();
 
-    String orderNo = "OD-${ref.id.substring(0, 6).toUpperCase()}";
+    String orderNo =
+        "OD-${ref.id.substring(0, 6).toUpperCase()}";
 
-    data['orderNo'] = orderNo;
-    data['date'] = FieldValue.serverTimestamp();
+    data['orderNo'] =
+        orderNo;
 
-    await ref.set(data);
+    data['date'] =
+        FieldValue.serverTimestamp();
+
+    await ref.set(
+      data,
+    );
   }
 
-  Future<void> updateCartQty(String id, int qty) async {
-    await cart.doc(id).update({
+  Future<void> updateCartQty(
+      String id,
+      double qty,
+      ) async {
+    await cart
+        .doc(id)
+        .update({
       'qty': qty,
     });
   }
 
-  Future<void> deleteCartItem(String id) async {
-    await cart.doc(id).delete();
+  Future<void> deleteCartItem(
+      String id,
+      ) async {
+    await cart
+        .doc(id)
+        .delete();
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getCart(String uid) async {
-    return await cart.where('uid', isEqualTo: uid).get();
+  Future<QuerySnapshot<Map<String, dynamic>>> getCart(
+      String uid,
+      ) async {
+    return await cart
+        .where(
+      'uid',
+      isEqualTo: uid,
+    )
+        .get();
   }
 }

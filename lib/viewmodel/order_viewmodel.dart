@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../repository/address_repo.dart';
+import '../repository/order_repo.dart';
 
 class OrderViewmodel extends ChangeNotifier {
   final FirebaseFirestore firestore =
@@ -14,33 +15,59 @@ class OrderViewmodel extends ChangeNotifier {
   final AddressRepository _addressRepository =
   AddressRepository();
 
-  User? get user => auth.currentUser;
+  final OrderRepository _orderRepository =
+  OrderRepository();
 
-  String address = "No address selected";
+  User? get user =>
+      auth.currentUser;
 
-  String paymentMethod = "UPI";
+  String address =
+      "No address selected";
 
-  bool isLoading = false;
+  String customerName =
+      "";
+
+  String customerPhone =
+      "";
+
+  String paymentMethod =
+      "UPI";
+
+  bool isLoading =
+  false;
 
   Future<void> loadOrderData() async {
     await getAddress();
+    await getCustomerDetails();
   }
 
-  void changePayment(String value) {
-    paymentMethod = value;
+  void changePayment(
+      String value,
+      ) {
+    paymentMethod =
+        value;
+
     notifyListeners();
   }
 
-  double getDouble(dynamic value) {
+  double getDouble(
+      dynamic value,
+      ) {
     return double.tryParse(
       value?.toString() ?? "0",
     ) ??
         0.0;
   }
 
-  bool isKgProduct(dynamic unit) {
+  bool isKgProduct(
+      dynamic unit,
+      ) {
     String value =
-        unit?.toString().trim().toLowerCase() ?? "";
+        unit
+            ?.toString()
+            .trim()
+            .toLowerCase() ??
+            "";
 
     return value == "kg" ||
         value == "kgs" ||
@@ -48,15 +75,21 @@ class OrderViewmodel extends ChangeNotifier {
         value == "kilograms";
   }
 
-  double normalizeQty(double value) {
+  double normalizeQty(
+      double value,
+      ) {
     return double.parse(
       value.toStringAsFixed(1),
     );
   }
 
-  String displayQty(double value) {
+  String displayQty(
+      double value,
+      ) {
     double qty =
-    normalizeQty(value);
+    normalizeQty(
+      value,
+    );
 
     if (qty ==
         qty.roundToDouble()) {
@@ -68,12 +101,13 @@ class OrderViewmodel extends ChangeNotifier {
     return qty.toStringAsFixed(1);
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>>
-  cartStream(
+  Stream<QuerySnapshot<Map<String, dynamic>>> cartStream(
       String uid,
       ) {
     return firestore
-        .collection('cart')
+        .collection(
+      'cart',
+    )
         .where(
       'uid',
       isEqualTo: uid,
@@ -81,12 +115,13 @@ class OrderViewmodel extends ChangeNotifier {
         .snapshots();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>>
-  orderStream(
+  Stream<QuerySnapshot<Map<String, dynamic>>> orderStream(
       String uid,
       ) {
     return firestore
-        .collection('orders')
+        .collection(
+      'orders',
+    )
         .where(
       'uid',
       isEqualTo: uid,
@@ -94,17 +129,22 @@ class OrderViewmodel extends ChangeNotifier {
         .snapshots();
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>>
-  orderDetailsStream(
+  Stream<DocumentSnapshot<Map<String, dynamic>>> orderDetailsStream(
       String orderId,
       ) {
     return firestore
-        .collection('orders')
-        .doc(orderId)
+        .collection(
+      'orders',
+    )
+        .doc(
+      orderId,
+    )
         .snapshots();
   }
 
-  String getDate(dynamic value) {
+  String getDate(
+      dynamic value,
+      ) {
     if (value == null) {
       return "";
     }
@@ -112,13 +152,16 @@ class OrderViewmodel extends ChangeNotifier {
     DateTime? date;
 
     if (value is Timestamp) {
-      date = value.toDate();
+      date =
+          value.toDate();
     } else if (value is DateTime) {
-      date = value;
+      date =
+          value;
     } else {
-      date = DateTime.tryParse(
-        value.toString(),
-      );
+      date =
+          DateTime.tryParse(
+            value.toString(),
+          );
     }
 
     if (date == null) {
@@ -142,12 +185,15 @@ class OrderViewmodel extends ChangeNotifier {
     );
 
     String year =
-    date.year.toString();
+    date.year
+        .toString();
 
     return "$day/$month/$year";
   }
 
-  bool placed(String status) {
+  bool placed(
+      String status,
+      ) {
     String value =
     status
         .trim()
@@ -155,13 +201,16 @@ class OrderViewmodel extends ChangeNotifier {
 
     return value == "pending" ||
         value == "placed" ||
+        value == "order placed" ||
         value == "accept" ||
         value == "accepted" ||
         value == "ready" ||
         value == "completed";
   }
 
-  bool accepted(String status) {
+  bool accepted(
+      String status,
+      ) {
     String value =
     status
         .trim()
@@ -173,7 +222,9 @@ class OrderViewmodel extends ChangeNotifier {
         value == "completed";
   }
 
-  bool ready(String status) {
+  bool ready(
+      String status,
+      ) {
     String value =
     status
         .trim()
@@ -183,7 +234,9 @@ class OrderViewmodel extends ChangeNotifier {
         value == "completed";
   }
 
-  bool completed(String status) {
+  bool completed(
+      String status,
+      ) {
     return status
         .trim()
         .toLowerCase() ==
@@ -191,11 +244,10 @@ class OrderViewmodel extends ChangeNotifier {
   }
 
   double getItemsTotal(
-      List<QueryDocumentSnapshot<
-          Map<String, dynamic>>>
-      docs,
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
       ) {
-    double total = 0.0;
+    double total =
+    0.0;
 
     for (var snap in docs) {
       Map<String, dynamic> data =
@@ -211,16 +263,15 @@ class OrderViewmodel extends ChangeNotifier {
         data['qty'],
       );
 
-      total += price * qty;
+      total +=
+          price * qty;
     }
 
     return total;
   }
 
   double getDeliveryCharge(
-      List<QueryDocumentSnapshot<
-          Map<String, dynamic>>>
-      docs,
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
       ) {
     if (docs.isEmpty) {
       return 0.0;
@@ -237,18 +288,84 @@ class OrderViewmodel extends ChangeNotifier {
         deliveryCharge;
   }
 
+  Future<void> getCustomerDetails() async {
+    User? currentUser =
+        auth.currentUser;
+
+    if (currentUser == null ||
+        currentUser.email == null) {
+      customerName =
+      "";
+
+      customerPhone =
+      "";
+
+      notifyListeners();
+
+      return;
+    }
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+      await _orderRepository.getCustomerDetails(
+        currentUser.email!,
+      );
+
+      if (snapshot.docs.isEmpty) {
+        customerName =
+        "";
+
+        customerPhone =
+        "";
+
+        notifyListeners();
+
+        return;
+      }
+
+      Map<String, dynamic> data =
+      snapshot.docs.first.data();
+
+      customerName =
+          data['name']
+              ?.toString()
+              .trim() ??
+              "";
+
+      customerPhone =
+          data['phone']
+              ?.toString()
+              .trim() ??
+              "";
+
+      notifyListeners();
+    } catch (e) {
+      print(
+        "GET CUSTOMER DETAILS ERROR: $e",
+      );
+
+      customerName =
+      "";
+
+      customerPhone =
+      "";
+
+      notifyListeners();
+    }
+  }
+
   Future<double> getProductStock(
       String productId,
       ) async {
     try {
-      DocumentSnapshot<
-          Map<String, dynamic>>
-      product =
+      DocumentSnapshot<Map<String, dynamic>> product =
       await firestore
           .collection(
         'productsdata',
       )
-          .doc(productId)
+          .doc(
+        productId,
+      )
           .get();
 
       if (!product.exists) {
@@ -267,14 +384,13 @@ class OrderViewmodel extends ChangeNotifier {
       );
     } catch (e) {
       print(e);
+
       return 0.0;
     }
   }
 
   Future<void> increaseQty(
-      QueryDocumentSnapshot<
-          Map<String, dynamic>>
-      snap,
+      QueryDocumentSnapshot<Map<String, dynamic>> snap,
       ) async {
     try {
       Map<String, dynamic> data =
@@ -297,7 +413,8 @@ class OrderViewmodel extends ChangeNotifier {
 
       double newQty =
       normalizeQty(
-        currentQty + step,
+        currentQty +
+            step,
       );
 
       String productId =
@@ -323,8 +440,12 @@ class OrderViewmodel extends ChangeNotifier {
       }
 
       await firestore
-          .collection('cart')
-          .doc(snap.id)
+          .collection(
+        'cart',
+      )
+          .doc(
+        snap.id,
+      )
           .update({
         'qty': newQty,
       });
@@ -334,9 +455,7 @@ class OrderViewmodel extends ChangeNotifier {
   }
 
   Future<void> decreaseQty(
-      QueryDocumentSnapshot<
-          Map<String, dynamic>>
-      snap,
+      QueryDocumentSnapshot<Map<String, dynamic>> snap,
       ) async {
     try {
       Map<String, dynamic> data =
@@ -364,7 +483,8 @@ class OrderViewmodel extends ChangeNotifier {
 
       double newQty =
       normalizeQty(
-        currentQty - step,
+        currentQty -
+            step,
       );
 
       if (newQty <
@@ -373,8 +493,12 @@ class OrderViewmodel extends ChangeNotifier {
       }
 
       await firestore
-          .collection('cart')
-          .doc(snap.id)
+          .collection(
+        'cart',
+      )
+          .doc(
+        snap.id,
+      )
           .update({
         'qty': newQty,
       });
@@ -388,8 +512,12 @@ class OrderViewmodel extends ChangeNotifier {
       ) async {
     try {
       await firestore
-          .collection('cart')
-          .doc(id)
+          .collection(
+        'cart',
+      )
+          .doc(
+        id,
+      )
           .delete();
     } catch (e) {
       print(e);
@@ -400,11 +528,11 @@ class OrderViewmodel extends ChangeNotifier {
       String uid,
       ) async {
     try {
-      QuerySnapshot<
-          Map<String, dynamic>>
-      snapshot =
+      QuerySnapshot<Map<String, dynamic>> snapshot =
       await firestore
-          .collection('cart')
+          .collection(
+        'cart',
+      )
           .where(
         'uid',
         isEqualTo: uid,
@@ -437,20 +565,14 @@ class OrderViewmodel extends ChangeNotifier {
       "No address selected";
 
       notifyListeners();
+
       return;
     }
 
     try {
-      QuerySnapshot<
-          Map<String, dynamic>>
-      snapshot =
-      await _addressRepository
-          .getUserAddresses(
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+      await _addressRepository.getUserAddresses(
         currentUser.uid,
-      );
-
-      print(
-        "ADDRESS COUNT: ${snapshot.docs.length}",
       );
 
       if (snapshot.docs.isEmpty) {
@@ -458,21 +580,17 @@ class OrderViewmodel extends ChangeNotifier {
         "No address selected";
 
         notifyListeners();
+
         return;
       }
 
-      QueryDocumentSnapshot<
-          Map<String, dynamic>>?
+      QueryDocumentSnapshot<Map<String, dynamic>>?
       defaultAddress;
 
       for (var doc
       in snapshot.docs) {
         Map<String, dynamic> data =
         doc.data();
-
-        print(
-          "ADDRESS DATA: $data",
-        );
 
         bool isDefault =
             data['isDefault'] ==
@@ -481,6 +599,7 @@ class OrderViewmodel extends ChangeNotifier {
         if (isDefault) {
           defaultAddress =
               doc;
+
           break;
         }
       }
@@ -491,6 +610,7 @@ class OrderViewmodel extends ChangeNotifier {
         "No address selected";
 
         notifyListeners();
+
         return;
       }
 
@@ -524,10 +644,6 @@ class OrderViewmodel extends ChangeNotifier {
         "No address selected";
       }
 
-      print(
-        "SELECTED ADDRESS: $address",
-      );
-
       notifyListeners();
     } catch (e) {
       print(
@@ -552,9 +668,7 @@ class OrderViewmodel extends ChangeNotifier {
 
   Future<bool> checkStock(
       BuildContext context,
-      List<QueryDocumentSnapshot<
-          Map<String, dynamic>>>
-      docs,
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
       ) async {
     for (var snap in docs) {
       Map<String, dynamic> data =
@@ -641,9 +755,7 @@ class OrderViewmodel extends ChangeNotifier {
 
   Future<void> placeOrder(
       BuildContext context,
-      List<QueryDocumentSnapshot<
-          Map<String, dynamic>>>
-      docs,
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
       double itemsTotal,
       double deliveryCharge,
       double totalAmount,
@@ -685,11 +797,33 @@ class OrderViewmodel extends ChangeNotifier {
       return;
     }
 
+    await getCustomerDetails();
+
+    if (customerPhone.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Please add your mobile number in profile",
+            ),
+            backgroundColor:
+            Colors.red,
+          ),
+        );
+      }
+
+      return;
+    }
+
     if (isLoading) {
       return;
     }
 
-    isLoading = true;
+    isLoading =
+    true;
+
     notifyListeners();
 
     try {
@@ -703,8 +837,8 @@ class OrderViewmodel extends ChangeNotifier {
         return;
       }
 
-      List<Map<String, dynamic>>
-      items = [];
+      List<Map<String, dynamic>> items =
+      [];
 
       for (var snap
       in docs) {
@@ -745,9 +879,7 @@ class OrderViewmodel extends ChangeNotifier {
         });
       }
 
-      DocumentReference<
-          Map<String, dynamic>>
-      orderDoc =
+      DocumentReference<Map<String, dynamic>> orderDoc =
       firestore
           .collection(
         'orders',
@@ -776,6 +908,13 @@ class OrderViewmodel extends ChangeNotifier {
         uid,
         'userId':
         uid,
+
+        'customerName':
+        customerName,
+
+        'customerPhone':
+        customerPhone,
+
         'items':
         items,
         'itemsTotal':
@@ -793,11 +932,9 @@ class OrderViewmodel extends ChangeNotifier {
         'stockDeducted':
         false,
         'date':
-        FieldValue
-            .serverTimestamp(),
+        FieldValue.serverTimestamp(),
         'createdAt':
-        FieldValue
-            .serverTimestamp(),
+        FieldValue.serverTimestamp(),
       });
 
       WriteBatch batch =
@@ -846,7 +983,9 @@ class OrderViewmodel extends ChangeNotifier {
         );
       }
     } finally {
-      isLoading = false;
+      isLoading =
+      false;
+
       notifyListeners();
     }
   }
