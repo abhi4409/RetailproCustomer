@@ -21,6 +21,7 @@ class HomeViewmodel extends ChangeNotifier {
 
   void searchProduct(String value) {
     _model.searchText = value;
+
     notifyListeners();
   }
 
@@ -39,17 +40,29 @@ class HomeViewmodel extends ChangeNotifier {
     }).toList();
   }
 
+  bool isKgProduct(
+      Map<String, dynamic> data,
+      ) {
+    String unit =
+        data['punits']?.toString().trim().toLowerCase() ?? "";
+
+    return unit == "kg" ||
+        unit == "kgs" ||
+        unit == "kilogram" ||
+        unit == "kilograms";
+  }
+
   Future<void> addToCart(
       BuildContext context,
       QueryDocumentSnapshot<Map<String, dynamic>> snap,
       ) async {
     var data = snap.data();
 
-    int stockQuantity =
-        int.tryParse(
+    double stockQuantity =
+        double.tryParse(
           data['pquantity']?.toString() ?? '0',
         ) ??
-            0;
+            0.0;
 
     if (stockQuantity <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,6 +73,30 @@ class HomeViewmodel extends ChangeNotifier {
           backgroundColor: Colors.red,
         ),
       );
+
+      return;
+    }
+
+    bool kgProduct = isKgProduct(data);
+
+    double addQuantity;
+
+    if (kgProduct) {
+      addQuantity = 0.1;
+    } else {
+      addQuantity = 1.0;
+    }
+
+    if (addQuantity > stockQuantity) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Not enough stock available",
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+
       return;
     }
 
@@ -68,9 +105,12 @@ class HomeViewmodel extends ChangeNotifier {
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please login first"),
+          content: Text(
+            "Please login first",
+          ),
         ),
       );
+
       return;
     }
 
@@ -83,23 +123,40 @@ class HomeViewmodel extends ChangeNotifier {
 
     if (check.docs.isNotEmpty) {
       var item = check.docs.first;
+
       var cartData = item.data();
 
-      int oldQty =
-          int.tryParse(
+      double oldQty =
+          double.tryParse(
             cartData['qty']?.toString() ?? '0',
           ) ??
-              0;
+              0.0;
 
-      int newQty = oldQty + 1;
+      double newQty = oldQty + addQuantity;
+
+      newQty = double.parse(
+        newQty.toStringAsFixed(1),
+      );
 
       if (newQty > stockQuantity) {
-        if (!context.mounted) return;
+        if (!context.mounted) {
+          return;
+        }
+
+        String stockText;
+
+        if (kgProduct) {
+          stockText =
+          "${stockQuantity.toStringAsFixed(1)} KG";
+        } else {
+          stockText =
+              stockQuantity.toInt().toString();
+        }
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Only $stockQuantity items available",
+              "Only $stockText available",
             ),
             backgroundColor: Colors.red,
           ),
@@ -113,11 +170,17 @@ class HomeViewmodel extends ChangeNotifier {
         newQty,
       );
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        return;
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Quantity increased"),
+          content: Text(
+            kgProduct
+                ? "0.1 KG added to cart"
+                : "Quantity increased",
+          ),
           backgroundColor: Colors.green,
         ),
       );
@@ -129,14 +192,20 @@ class HomeViewmodel extends ChangeNotifier {
         'price': data['pselling price'],
         'pcatogory': data['pcatogory'],
         'unit': data['punits'],
-        'qty': 1,
+        'qty': addQuantity,
       });
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        return;
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Added to cart"),
+          content: Text(
+            kgProduct
+                ? "0.1 KG added to cart"
+                : "Added to cart",
+          ),
           backgroundColor: Colors.green,
         ),
       );
@@ -152,9 +221,12 @@ class HomeViewmodel extends ChangeNotifier {
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please login first"),
+          content: Text(
+            "Please login first",
+          ),
         ),
       );
+
       return;
     }
 
@@ -167,11 +239,16 @@ class HomeViewmodel extends ChangeNotifier {
 
     if (check.docs.isNotEmpty) {
       if (!_model.favoriteIds.contains(snap.id)) {
-        _model.favoriteIds.add(snap.id);
+        _model.favoriteIds.add(
+          snap.id,
+        );
+
         notifyListeners();
       }
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        return;
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -191,11 +268,15 @@ class HomeViewmodel extends ChangeNotifier {
         'price': data['pselling price'],
       });
 
-      _model.favoriteIds.add(snap.id);
+      _model.favoriteIds.add(
+        snap.id,
+      );
 
       notifyListeners();
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        return;
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../viewmodel/home_viewmodel.dart';
 import '../Catogries/Categories.dart';
 import 'Detail _page.dart';
@@ -371,14 +372,13 @@ class _HomState extends State<Hom> {
 
           String image =
               data['pimage']?.toString() ?? "";
-
-          int stockQuantity =
-              int.tryParse(
+          double stockQuantity =
+              double.tryParse(
                 data['pquantity']
                     ?.toString() ??
                     '0',
               ) ??
-                  0;
+                  0.0;
 
           bool isAvailable =
               stockQuantity > 0;
@@ -419,8 +419,7 @@ class _HomState extends State<Hom> {
                   Stack(
                     children: [
                       Container(
-                        width:
-                        double.infinity,
+                        width: double.infinity,
                         height: 110,
                         decoration:
                         BoxDecoration(
@@ -493,8 +492,7 @@ class _HomState extends State<Hom> {
                           Colors.white
                               .withOpacity(
                               0.9),
-                          child:
-                          IconButton(
+                          child: IconButton(
                             padding:
                             EdgeInsets.zero,
                             iconSize: 18,
@@ -575,7 +573,8 @@ class _HomState extends State<Hom> {
                               .ellipsis,
                           style: TextStyle(
                             fontWeight:
-                            FontWeight.bold,
+                            FontWeight
+                                .bold,
                             fontSize: 13,
                           ),
                         ),
@@ -593,7 +592,8 @@ class _HomState extends State<Hom> {
                           style: TextStyle(
                             fontSize: 11,
                             color: Colors
-                                .grey.shade600,
+                                .grey
+                                .shade600,
                           ),
                         ),
 
@@ -603,10 +603,12 @@ class _HomState extends State<Hom> {
                           Text(
                             "Currently Unavailable",
                             style: TextStyle(
-                              color: Colors.red,
+                              color:
+                              Colors.red,
                               fontSize: 10,
                               fontWeight:
-                              FontWeight.bold,
+                              FontWeight
+                                  .bold,
                             ),
                           ),
 
@@ -649,8 +651,7 @@ class _HomState extends State<Hom> {
                               BorderRadius
                                   .circular(
                                   8),
-                              child:
-                              Container(
+                              child: Container(
                                 padding:
                                 EdgeInsets
                                     .symmetric(

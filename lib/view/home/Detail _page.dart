@@ -16,8 +16,7 @@ class Detail extends StatefulWidget {
       _DetailState();
 }
 
-class _DetailState
-    extends State<Detail> {
+class _DetailState extends State<Detail> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -25,8 +24,7 @@ class _DetailState
           DetailViewmodel(
             snap: widget.snap,
           ),
-      child:
-      Consumer<DetailViewmodel>(
+      child: Consumer<DetailViewmodel>(
         builder:
             (context, provider, child) {
           final isAvailable =
@@ -55,8 +53,7 @@ class _DetailState
               Colors.white,
               elevation: 0,
             ),
-            body:
-            SingleChildScrollView(
+            body: SingleChildScrollView(
               padding:
               EdgeInsets.symmetric(
                 horizontal: 16,
@@ -166,8 +163,7 @@ class _DetailState
                                 .spaceBetween,
                             children: [
                               Expanded(
-                                child:
-                                Text(
+                                child: Text(
                                   provider.snap[
                                   'pname']
                                       ?.toString() ??
@@ -184,8 +180,7 @@ class _DetailState
                               ),
 
                               SizedBox(
-                                  width:
-                                  10),
+                                  width: 10),
 
                               Text(
                                 "₹${provider.snap['pselling price']?.toString() ?? '0'}",
@@ -297,9 +292,17 @@ class _DetailState
                                 .inventory_outlined,
                             label:
                             "Available Stock",
+
+                            // KG shows:
+                            // 0.1 KG, 0.5 KG, 2.5 KG
+                            //
+                            // Other units show:
+                            // 1, 2, 3 etc.
                             value: provider
-                                .stockQuantity
-                                .toString(),
+                                .isKgProduct
+                                ? "${provider.displayStock} KG"
+                                : provider
+                                .displayStock,
                           ),
                         ],
                       ),
@@ -372,18 +375,19 @@ class _DetailState
                         padding:
                         EdgeInsets
                             .symmetric(
-                          horizontal:
-                          16,
+                          horizontal: 16,
                           vertical: 12,
                         ),
                         child: Row(
                           children: [
                             Text(
-                              "Quantity",
+                              provider
+                                  .isKgProduct
+                                  ? "Quantity (KG)"
+                                  : "Quantity",
                               style:
                               TextStyle(
-                                fontSize:
-                                16,
+                                fontSize: 16,
                                 fontWeight:
                                 FontWeight
                                     .bold,
@@ -416,20 +420,26 @@ class _DetailState
                                       Icons
                                           .remove,
                                       color:
-                                      Colors.blue,
+                                      Colors
+                                          .blue,
                                     ),
                                   ),
 
+                                  // KG:
+                                  // 0.1, 0.2, 0.3...
+                                  //
+                                  // Normal:
+                                  // 1, 2, 3...
                                   Text(
                                     provider
-                                        .qty
-                                        .toString(),
+                                        .displayQty,
                                     style:
                                     TextStyle(
                                       fontSize:
                                       16,
                                       fontWeight:
-                                      FontWeight.bold,
+                                      FontWeight
+                                          .bold,
                                     ),
                                   ),
 
@@ -441,10 +451,10 @@ class _DetailState
                                     },
                                     icon:
                                     Icon(
-                                      Icons
-                                          .add,
+                                      Icons.add,
                                       color:
-                                      Colors.blue,
+                                      Colors
+                                          .blue,
                                     ),
                                   ),
                                 ],
@@ -463,8 +473,7 @@ class _DetailState
                     height: 50,
                     child:
                     ElevatedButton(
-                      style:
-                      ElevatedButton
+                      style: ElevatedButton
                           .styleFrom(
                         backgroundColor:
                         Colors.blue,
@@ -498,8 +507,7 @@ class _DetailState
                       child: provider
                           .isAdding
                           ? SizedBox(
-                        height:
-                        20,
+                        height: 20,
                         width: 20,
                         child:
                         CircularProgressIndicator(
@@ -520,12 +528,10 @@ class _DetailState
                                 .shopping_cart_outlined
                                 : Icons
                                 .block,
-                            size:
-                            20,
+                            size: 20,
                           ),
                           SizedBox(
-                              width:
-                              8),
+                              width: 8),
                           Text(
                             isAvailable
                                 ? "Add to Cart"

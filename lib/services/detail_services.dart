@@ -26,14 +26,16 @@ class DetailServices {
     )
         .get();
   }
+
   Future<void> updateCartQuantity(
       String id,
-      int qty,
+      double qty,
       ) async {
     await cart.doc(id).update({
       'qty': qty,
     });
   }
+
   Future<void> addCart(
       Map<String, dynamic> data,
       ) async {

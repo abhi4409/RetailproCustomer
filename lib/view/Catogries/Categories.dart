@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../viewmodel/category_viewmodel.dart';
 import '../home/Detail _page.dart';
 import '../home/Myfavorates.dart';
@@ -8,7 +9,7 @@ import '../home/Myfavorates.dart';
 class Catego extends StatefulWidget {
   final int categoryIndex;
 
-  Catego({
+  const Catego({
     super.key,
     this.categoryIndex = 0,
   });
@@ -27,8 +28,7 @@ class _CategoState extends State<Catego> {
             categoryIndex:
             widget.categoryIndex,
           ),
-      child:
-      Consumer<CategoryViewmodel>(
+      child: Consumer<CategoryViewmodel>(
         builder:
             (context, provider, child) {
           return Scaffold(
@@ -170,18 +170,15 @@ class _CategoState extends State<Catego> {
                         ),
                       ),
 
-                      SizedBox(
-                          height: 14),
+                      SizedBox(height: 14),
 
                       SizedBox(
                         height: 40,
-                        child: ListView
-                            .builder(
+                        child:
+                        ListView.builder(
                           scrollDirection:
-                          Axis
-                              .horizontal,
-                          itemCount:
-                          provider
+                          Axis.horizontal,
+                          itemCount: provider
                               .categories
                               .length,
                           itemBuilder:
@@ -199,8 +196,7 @@ class _CategoState extends State<Catego> {
                                   index,
                                 );
                               },
-                              child:
-                              Container(
+                              child: Container(
                                 margin:
                                 EdgeInsets
                                     .only(
@@ -226,8 +222,7 @@ class _CategoState extends State<Catego> {
                                       .circular(
                                       20),
                                   border:
-                                  Border
-                                      .all(
+                                  Border.all(
                                     color: isSelected
                                         ? Colors
                                         .blue
@@ -236,10 +231,8 @@ class _CategoState extends State<Catego> {
                                         .shade300,
                                   ),
                                 ),
-                                child:
-                                Center(
-                                  child:
-                                  Text(
+                                child: Center(
+                                  child: Text(
                                     provider
                                         .categories[
                                     index],
@@ -265,8 +258,7 @@ class _CategoState extends State<Catego> {
                         ),
                       ),
 
-                      SizedBox(
-                          height: 16),
+                      SizedBox(height: 16),
 
                       filteredProducts
                           .isEmpty
@@ -311,8 +303,7 @@ class _CategoState extends State<Catego> {
                           ],
                         ),
                       )
-                          : GridView
-                          .builder(
+                          : GridView.builder(
                         physics:
                         NeverScrollableScrollPhysics(),
                         shrinkWrap:
@@ -353,14 +344,21 @@ class _CategoState extends State<Catego> {
                                   ?.toString() ??
                                   "";
 
-                          int stockQuantity =
-                              int.tryParse(
-                                data['pquantity']?.toString() ??
+                          // IMPORTANT:
+                          // double supports KG stock:
+                          // 0.1, 0.2, 0.5 etc.
+                          double
+                          stockQuantity =
+                              double
+                                  .tryParse(
+                                data['pquantity']
+                                    ?.toString() ??
                                     '0',
                               ) ??
-                                  0;
+                                  0.0;
 
-                          bool isAvailable =
+                          bool
+                          isAvailable =
                               stockQuantity >
                                   0;
 
@@ -379,13 +377,13 @@ class _CategoState extends State<Catego> {
                                 .antiAlias,
                             child:
                             InkWell(
-                              onTap:
-                                  () {
+                              onTap: () {
                                 Navigator
                                     .push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
+                                    builder:
+                                        (context) =>
                                         Detail(
                                           snap:
                                           snap,
@@ -393,8 +391,7 @@ class _CategoState extends State<Catego> {
                                   ),
                                 );
                               },
-                              child:
-                              Column(
+                              child: Column(
                                 crossAxisAlignment:
                                 CrossAxisAlignment
                                     .start,
@@ -437,8 +434,7 @@ class _CategoState extends State<Catego> {
                                         ),
 
                                         Positioned(
-                                          top:
-                                          6,
+                                          top: 6,
                                           right:
                                           6,
                                           child:
@@ -447,7 +443,8 @@ class _CategoState extends State<Catego> {
                                             16,
                                             backgroundColor: Colors
                                                 .white
-                                                .withOpacity(0.9),
+                                                .withOpacity(
+                                                0.9),
                                             child:
                                             IconButton(
                                               padding:
@@ -463,8 +460,11 @@ class _CategoState extends State<Catego> {
                                               },
                                               icon:
                                               Icon(
-                                                isFav ? Icons.favorite : Icons.favorite_border,
-                                                color: Colors.red,
+                                                isFav
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                                color:
+                                                Colors.red,
                                               ),
                                             ),
                                           ),
@@ -480,21 +480,29 @@ class _CategoState extends State<Catego> {
                                             Container(
                                               padding:
                                               EdgeInsets.symmetric(
-                                                horizontal: 7,
-                                                vertical: 4,
+                                                horizontal:
+                                                7,
+                                                vertical:
+                                                4,
                                               ),
                                               decoration:
                                               BoxDecoration(
-                                                color: Colors.red,
-                                                borderRadius: BorderRadius.circular(6),
+                                                color:
+                                                Colors.red,
+                                                borderRadius:
+                                                BorderRadius.circular(6),
                                               ),
                                               child:
                                               Text(
                                                 "Unavailable",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 9,
-                                                  fontWeight: FontWeight.bold,
+                                                style:
+                                                TextStyle(
+                                                  color:
+                                                  Colors.white,
+                                                  fontSize:
+                                                  9,
+                                                  fontWeight:
+                                                  FontWeight.bold,
                                                 ),
                                               ),
                                             ),
@@ -505,19 +513,28 @@ class _CategoState extends State<Catego> {
 
                                   Padding(
                                     padding:
-                                    EdgeInsets.all(10),
+                                    EdgeInsets
+                                        .all(
+                                        10),
                                     child:
                                     Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                      CrossAxisAlignment
+                                          .start,
                                       children: [
                                         Text(
-                                          data['pname']?.toString() ?? "",
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                          data['pname']?.toString() ??
+                                              "",
+                                          maxLines:
+                                          1,
+                                          overflow:
+                                          TextOverflow.ellipsis,
+                                          style:
+                                          TextStyle(
+                                            fontSize:
+                                            14,
+                                            fontWeight:
+                                            FontWeight.bold,
                                           ),
                                         ),
 
@@ -528,10 +545,14 @@ class _CategoState extends State<Catego> {
                                         if (!isAvailable)
                                           Text(
                                             "Currently Unavailable",
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
+                                            style:
+                                            TextStyle(
+                                              color:
+                                              Colors.red,
+                                              fontSize:
+                                              10,
+                                              fontWeight:
+                                              FontWeight.bold,
                                             ),
                                           ),
 
@@ -544,14 +565,21 @@ class _CategoState extends State<Catego> {
                                           MainAxisAlignment.spaceBetween,
                                           children: [
                                             Expanded(
-                                              child: Text(
+                                              child:
+                                              Text(
                                                 "₹${data['pselling price']?.toString() ?? '0'}",
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.blue.shade900,
+                                                maxLines:
+                                                1,
+                                                overflow:
+                                                TextOverflow.ellipsis,
+                                                style:
+                                                TextStyle(
+                                                  fontSize:
+                                                  15,
+                                                  fontWeight:
+                                                  FontWeight.bold,
+                                                  color:
+                                                  Colors.blue.shade900,
                                                 ),
                                               ),
                                             ),
@@ -569,23 +597,33 @@ class _CategoState extends State<Catego> {
                                               BorderRadius.circular(8),
                                               child:
                                               Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 6,
+                                                padding:
+                                                EdgeInsets.symmetric(
+                                                  horizontal:
+                                                  8,
+                                                  vertical:
+                                                  6,
                                                 ),
-                                                decoration: BoxDecoration(
-                                                  color: isAvailable ? Colors.blue : Colors.grey,
-                                                  borderRadius: BorderRadius.circular(8),
+                                                decoration:
+                                                BoxDecoration(
+                                                  color: isAvailable
+                                                      ? Colors.blue
+                                                      : Colors.grey,
+                                                  borderRadius:
+                                                  BorderRadius.circular(8),
                                                 ),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
+                                                child:
+                                                Row(
+                                                  mainAxisSize:
+                                                  MainAxisSize.min,
                                                   children: [
                                                     Icon(
                                                       isAvailable ? Icons.add : Icons.block,
                                                       color: Colors.white,
                                                       size: 14,
                                                     ),
-                                                    SizedBox(width: 2),
+                                                    SizedBox(
+                                                        width: 2),
                                                     Text(
                                                       isAvailable ? "Add" : "Unavailable",
                                                       style: TextStyle(
@@ -610,8 +648,7 @@ class _CategoState extends State<Catego> {
                         },
                       ),
 
-                      SizedBox(
-                          height: 20),
+                      SizedBox(height: 20),
                     ],
                   ),
                 );

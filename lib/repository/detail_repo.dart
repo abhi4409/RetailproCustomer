@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../services/detail_services.dart';
 
 class DetailRepository {
@@ -9,6 +10,7 @@ class DetailRepository {
   User? getCurrentUser() {
     return _services.getCurrentUser();
   }
+
   Future<QuerySnapshot<Map<String, dynamic>>> checkCart(
       String uid,
       String productId,
@@ -18,15 +20,17 @@ class DetailRepository {
       productId,
     );
   }
+
   Future<void> updateCartQuantity(
       String id,
-      int qty,
+      double qty,
       ) async {
     await _services.updateCartQuantity(
       id,
       qty,
     );
   }
+
   Future<void> addCart(
       Map<String, dynamic> data,
       ) async {

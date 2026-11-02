@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../services/home_service.dart';
+
 class HomeRepository {
-  final HomeServices _services = HomeServices();
+  final HomeServices _services =
+  HomeServices();
 
   User? getCurrentUser() {
     return _services.getCurrentUser();
@@ -16,14 +19,20 @@ class HomeRepository {
       String uid,
       String productId,
       ) async {
-    return await _services.checkCart(uid, productId);
+    return await _services.checkCart(
+      uid,
+      productId,
+    );
   }
 
   Future<void> updateCartQty(
       String id,
-      int qty,
+      double qty,
       ) async {
-    await _services.updateCartQty(id, qty);
+    await _services.updateCartQty(
+      id,
+      qty,
+    );
   }
 
   Future<void> addCart(
@@ -36,7 +45,10 @@ class HomeRepository {
       String uid,
       String productId,
       ) async {
-    return await _services.checkFavorite(uid, productId);
+    return await _services.checkFavorite(
+      uid,
+      productId,
+    );
   }
 
   Future<void> addFavorite(

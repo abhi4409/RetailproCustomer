@@ -20,44 +20,34 @@ class CategoryViewmodel extends ChangeNotifier {
     );
   }
 
-  String get searchText =>
-      _model.searchText;
+  String get searchText => _model.searchText;
 
-  int get selectedCategory =>
-      _model.selectedCategory;
+  int get selectedCategory => _model.selectedCategory;
 
-  List<String> get favoriteIds =>
-      _model.favoriteIds;
+  List<String> get favoriteIds => _model.favoriteIds;
 
-  List<String> get categories =>
-      _model.categories;
+  List<String> get categories => _model.categories;
 
-  User? get user =>
-      _repository.getCurrentUser();
+  User? get user => _repository.getCurrentUser();
 
-  Stream<QuerySnapshot<Map<String, dynamic>>>
-  get productStream {
+  Stream<QuerySnapshot<Map<String, dynamic>>> get productStream {
     return _repository.getProducts();
   }
 
   void searchProduct(String value) {
     _model.searchText = value;
+
     notifyListeners();
   }
 
   void changeCategory(int index) {
     _model.selectedCategory = index;
+
     notifyListeners();
   }
 
-  List<
-      QueryDocumentSnapshot<
-          Map<String, dynamic>>>
-  filterProducts(
-      List<
-          QueryDocumentSnapshot<
-              Map<String, dynamic>>>
-      docs,
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> filterProducts(
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
       ) {
     return docs.where((product) {
       final data = product.data();
@@ -98,25 +88,32 @@ class CategoryViewmodel extends ChangeNotifier {
     }).toList();
   }
 
+  bool isKgProduct(
+      Map<String, dynamic> data,
+      ) {
+    String unit =
+        data['punits']?.toString().trim().toLowerCase() ?? "";
+
+    return unit == "kg" ||
+        unit == "kgs" ||
+        unit == "kilogram" ||
+        unit == "kilograms";
+  }
+
   Future<void> addToCart(
       BuildContext context,
-      QueryDocumentSnapshot<
-          Map<String, dynamic>>
-      snap,
+      QueryDocumentSnapshot<Map<String, dynamic>> snap,
       ) async {
     final productData = snap.data();
 
-    final int stockQuantity =
-        int.tryParse(
-          productData['pquantity']
-              ?.toString() ??
-              '0',
+    final double stockQuantity =
+        double.tryParse(
+          productData['pquantity']?.toString() ?? '0',
         ) ??
-            0;
+            0.0;
 
     if (stockQuantity <= 0) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             "This product is currently unavailable",
@@ -128,49 +125,88 @@ class CategoryViewmodel extends ChangeNotifier {
       return;
     }
 
-    final user =
-    _repository.getCurrentUser();
+    bool kgProduct =
+    isKgProduct(productData);
 
-    if (user == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+    double addQuantity;
+
+    if (kgProduct) {
+      addQuantity = 0.1;
+    } else {
+      addQuantity = 1.0;
+    }
+
+    if (addQuantity > stockQuantity) {
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-          Text("Please login first"),
+          content: Text(
+            "Not enough stock available",
+          ),
+          backgroundColor: Colors.red,
         ),
       );
+
+      return;
+    }
+
+    final user = _repository.getCurrentUser();
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please login first",
+          ),
+        ),
+      );
+
       return;
     }
 
     final String uid = user.uid;
 
-    final check =
-    await _repository.checkCart(
+    final check = await _repository.checkCart(
       uid,
       snap.id,
     );
 
     if (check.docs.isNotEmpty) {
       final item = check.docs.first;
+
       final data = item.data();
 
-      final int oldQty =
-          int.tryParse(
-            data['qty']?.toString() ??
-                '0',
+      final double oldQty =
+          double.tryParse(
+            data['qty']?.toString() ?? '0',
           ) ??
-              0;
+              0.0;
 
-      final int newQty = oldQty + 1;
+      double newQty =
+          oldQty + addQuantity;
+
+      newQty = double.parse(
+        newQty.toStringAsFixed(1),
+      );
 
       if (newQty > stockQuantity) {
-        if (!context.mounted) return;
+        if (!context.mounted) {
+          return;
+        }
 
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
+        String stockText;
+
+        if (kgProduct) {
+          stockText =
+          "${stockQuantity.toStringAsFixed(1)} KG";
+        } else {
+          stockText =
+              stockQuantity.toInt().toString();
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Only $stockQuantity items available",
+              "Only $stockText available",
             ),
             backgroundColor: Colors.red,
           ),
@@ -184,13 +220,17 @@ class CategoryViewmodel extends ChangeNotifier {
         newQty,
       );
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-          Text("Quantity increased"),
+          content: Text(
+            kgProduct
+                ? "0.1 KG added to cart"
+                : "Quantity increased",
+          ),
           backgroundColor: Colors.green,
         ),
       );
@@ -199,20 +239,23 @@ class CategoryViewmodel extends ChangeNotifier {
         'uid': uid,
         'productId': snap.id,
         'pname': productData['pname'],
-        'price':
-        productData['pselling price'],
-        'pcatogory':
-        productData['pcatogory'],
+        'price': productData['pselling price'],
+        'pcatogory': productData['pcatogory'],
         'unit': productData['punits'],
-        'qty': 1,
+        'qty': addQuantity,
       });
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Added to cart"),
+          content: Text(
+            kgProduct
+                ? "0.1 KG added to cart"
+                : "Added to cart",
+          ),
           backgroundColor: Colors.green,
         ),
       );
@@ -221,21 +264,19 @@ class CategoryViewmodel extends ChangeNotifier {
 
   Future<void> addFavorite(
       BuildContext context,
-      QueryDocumentSnapshot<
-          Map<String, dynamic>>
-      snap,
+      QueryDocumentSnapshot<Map<String, dynamic>> snap,
       ) async {
-    final user =
-    _repository.getCurrentUser();
+    final user = _repository.getCurrentUser();
 
     if (user == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-          Text("Please login first"),
+          content: Text(
+            "Please login first",
+          ),
         ),
       );
+
       return;
     }
 
@@ -248,8 +289,7 @@ class CategoryViewmodel extends ChangeNotifier {
     );
 
     if (check.docs.isNotEmpty) {
-      if (!_model.favoriteIds
-          .contains(snap.id)) {
+      if (!_model.favoriteIds.contains(snap.id)) {
         _model.favoriteIds.add(
           snap.id,
         );
@@ -257,10 +297,11 @@ class CategoryViewmodel extends ChangeNotifier {
         notifyListeners();
       }
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             "Already added to favorites",
@@ -274,10 +315,8 @@ class CategoryViewmodel extends ChangeNotifier {
         'uid': uid,
         'productId': snap.id,
         'pname': data['pname'],
-        'pcatogory':
-        data['pcatogory'],
-        'price':
-        data['pselling price'],
+        'pcatogory': data['pcatogory'],
+        'price': data['pselling price'],
       });
 
       _model.favoriteIds.add(
@@ -286,16 +325,16 @@ class CategoryViewmodel extends ChangeNotifier {
 
       notifyListeners();
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        return;
+      }
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             "Added to favorites",
           ),
-          backgroundColor:
-          Colors.green,
+          backgroundColor: Colors.green,
         ),
       );
     }

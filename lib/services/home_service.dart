@@ -24,14 +24,20 @@ class HomeServices {
       String productId,
       ) async {
     return await cart
-        .where('uid', isEqualTo: uid)
-        .where('productId', isEqualTo: productId)
+        .where(
+      'uid',
+      isEqualTo: uid,
+    )
+        .where(
+      'productId',
+      isEqualTo: productId,
+    )
         .get();
   }
 
   Future<void> updateCartQty(
       String id,
-      int qty,
+      double qty,
       ) async {
     await cart.doc(id).update({
       'qty': qty,
@@ -49,8 +55,14 @@ class HomeServices {
       String productId,
       ) async {
     return await favorites
-        .where('uid', isEqualTo: uid)
-        .where('productId', isEqualTo: productId)
+        .where(
+      'uid',
+      isEqualTo: uid,
+    )
+        .where(
+      'productId',
+      isEqualTo: productId,
+    )
         .get();
   }
 
