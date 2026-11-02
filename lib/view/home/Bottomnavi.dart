@@ -23,7 +23,14 @@ class _BottamnaviiState extends State<Bottamnavii> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
-          currentIndex:Selected,
+          currentIndex: Selected,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.blueGrey.shade900,
+          selectedItemColor: Colors.lightBlueAccent,
+          unselectedItemColor: Colors.white70,
+          selectedLabelStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
           onTap: (index){
             setState(() {
               Selected=index;
