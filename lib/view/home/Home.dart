@@ -64,22 +64,30 @@ class _HomState extends State<Hom> {
           }
 
           final docs = snapshot.data!.docs;
-          final filteredProducts = provider.filterProducts(
+
+          final filteredProducts =
+          provider.filterProducts(
             docs,
           );
 
           return SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
               children: [
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius:
+                    BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black
+                            .withOpacity(0.04),
                         blurRadius: 6,
                         offset: Offset(0, 3),
                       ),
@@ -102,25 +110,31 @@ class _HomState extends State<Hom> {
                         color: Colors.blue,
                         size: 24,
                       ),
-                      hintText: "Search for Products",
+                      hintText:
+                      "Search for Products",
                       hintStyle: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade500,
+                        color:
+                        Colors.grey.shade500,
                       ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding:
+                      EdgeInsets.symmetric(
                         vertical: 14,
                         horizontal: 16,
                       ),
                     ),
                   ),
                 ),
+
                 SizedBox(height: 16),
+
                 Container(
                   height: 180,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius:
+                    BorderRadius.circular(16),
                     image: DecorationImage(
                       image: AssetImage(
                         "lib/view/images/promo.png",
@@ -129,7 +143,9 @@ class _HomState extends State<Hom> {
                     ),
                   ),
                 ),
+
                 SizedBox(height: 20),
+
                 Text(
                   "Shop By Category",
                   style: TextStyle(
@@ -137,12 +153,15 @@ class _HomState extends State<Hom> {
                     fontSize: 18,
                   ),
                 ),
+
                 SizedBox(height: 12),
+
                 Row(
                   children: [
                     _buildCategoryItem(
                       context: context,
-                      icon: Icons.local_grocery_store_outlined,
+                      icon: Icons
+                          .local_grocery_store_outlined,
                       title: "Grocery",
                       color: Colors.green,
                       categoryIndex: 1,
@@ -150,7 +169,8 @@ class _HomState extends State<Hom> {
                     SizedBox(width: 8),
                     _buildCategoryItem(
                       context: context,
-                      icon: Icons.local_drink_outlined,
+                      icon:
+                      Icons.local_drink_outlined,
                       title: "Dairy",
                       color: Colors.blue,
                       categoryIndex: 4,
@@ -166,14 +186,17 @@ class _HomState extends State<Hom> {
                     SizedBox(width: 8),
                     _buildCategoryItem(
                       context: context,
-                      icon: Icons.local_cafe_outlined,
+                      icon:
+                      Icons.local_cafe_outlined,
                       title: "Beverages",
                       color: Colors.orange,
                       categoryIndex: 2,
                     ),
                   ],
                 ),
+
                 SizedBox(height: 20),
+
                 Text(
                   "Featured Products",
                   style: TextStyle(
@@ -181,12 +204,17 @@ class _HomState extends State<Hom> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
                 SizedBox(height: 12),
+
                 _buildProductHorizontalList(
-                  filteredProducts: filteredProducts,
+                  filteredProducts:
+                  filteredProducts,
                   provider: provider,
                 ),
+
                 SizedBox(height: 20),
+
                 Text(
                   "Best Offers",
                   style: TextStyle(
@@ -194,12 +222,15 @@ class _HomState extends State<Hom> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
                 SizedBox(height: 12),
+
                 Container(
                   height: 180,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius:
+                    BorderRadius.circular(16),
                     image: DecorationImage(
                       image: AssetImage(
                         "lib/view/images/best.png",
@@ -208,7 +239,9 @@ class _HomState extends State<Hom> {
                     ),
                   ),
                 ),
+
                 SizedBox(height: 20),
+
                 Text(
                   "Popular Products",
                   style: TextStyle(
@@ -216,11 +249,15 @@ class _HomState extends State<Hom> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
                 SizedBox(height: 12),
+
                 _buildProductHorizontalList(
-                  filteredProducts: filteredProducts,
+                  filteredProducts:
+                  filteredProducts,
                   provider: provider,
                 ),
+
                 SizedBox(height: 20),
               ],
             ),
@@ -253,21 +290,25 @@ class _HomState extends State<Hom> {
           height: 85,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius:
+            BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color:
+                Colors.black.withOpacity(0.03),
                 blurRadius: 4,
                 offset: Offset(0, 2),
               ),
             ],
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment:
+            MainAxisAlignment.center,
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: color.withOpacity(0.12),
+                backgroundColor:
+                color.withOpacity(0.12),
                 child: Icon(
                   icon,
                   color: color,
@@ -280,7 +321,8 @@ class _HomState extends State<Hom> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade800,
+                  color:
+                  Colors.grey.shade800,
                 ),
               ),
             ],
@@ -291,7 +333,10 @@ class _HomState extends State<Hom> {
   }
 
   Widget _buildProductHorizontalList({
-    required List<QueryDocumentSnapshot<Map<String, dynamic>>> filteredProducts,
+    required List<
+        QueryDocumentSnapshot<
+            Map<String, dynamic>>>
+    filteredProducts,
     required HomeViewmodel provider,
   }) {
     if (filteredProducts.isEmpty) {
@@ -309,183 +354,353 @@ class _HomState extends State<Hom> {
     }
 
     return SizedBox(
-      height: 220,
+      height: 235,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: filteredProducts.length,
         itemBuilder: (context, index) {
-          final snap = filteredProducts[index];
+          final snap =
+          filteredProducts[index];
+
           final data = snap.data();
-          final isFav = provider.favoriteIds.contains(
+
+          final isFav =
+          provider.favoriteIds.contains(
             snap.id,
           );
-          String image = data['pimage']?.toString() ?? "";
+
+          String image =
+              data['pimage']?.toString() ?? "";
+
+          int stockQuantity =
+              int.tryParse(
+                data['pquantity']
+                    ?.toString() ??
+                    '0',
+              ) ??
+                  0;
+
+          bool isAvailable =
+              stockQuantity > 0;
 
           return GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Detail(
-                    snap: snap,
-                  ),
+                  builder: (context) =>
+                      Detail(
+                        snap: snap,
+                      ),
                 ),
               );
             },
             child: Container(
               width: 155,
-              margin: EdgeInsets.only(right: 12),
+              margin:
+              EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius:
+                BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black
+                        .withOpacity(0.04),
                     blurRadius: 4,
                     offset: Offset(0, 2),
                   ),
                 ],
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
                 children: [
                   Stack(
                     children: [
                       Container(
-                        width: double.infinity,
+                        width:
+                        double.infinity,
                         height: 110,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(14),
+                        decoration:
+                        BoxDecoration(
+                          color: Colors
+                              .grey.shade50,
+                          borderRadius:
+                          BorderRadius
+                              .vertical(
+                            top:
+                            Radius.circular(
+                                14),
                           ),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(14),
+                          borderRadius:
+                          BorderRadius
+                              .vertical(
+                            top:
+                            Radius.circular(
+                                14),
                           ),
-                          child: image.isEmpty
+                          child:
+                          image.isEmpty
                               ? Center(
-                            child: Icon(
-                              Icons.inventory_2_outlined,
-                              size: 45,
-                              color: Colors.grey.shade400,
+                            child:
+                            Icon(
+                              Icons
+                                  .inventory_2_outlined,
+                              size:
+                              45,
+                              color: Colors
+                                  .grey
+                                  .shade400,
                             ),
                           )
-                              : Image.network(
+                              : Image
+                              .network(
                             image,
-                            fit: BoxFit.cover,
-                            errorBuilder: (
+                            fit: BoxFit
+                                .cover,
+                            errorBuilder:
+                                (
                                 context,
                                 error,
                                 stackTrace,
                                 ) {
                               return Center(
-                                child: Icon(
-                                  Icons.inventory_2_outlined,
-                                  size: 45,
-                                  color: Colors.grey.shade400,
+                                child:
+                                Icon(
+                                  Icons
+                                      .inventory_2_outlined,
+                                  size:
+                                  45,
+                                  color: Colors
+                                      .grey
+                                      .shade400,
                                 ),
                               );
                             },
                           ),
                         ),
                       ),
+
                       Positioned(
                         top: 6,
                         right: 6,
                         child: CircleAvatar(
                           radius: 15,
-                          backgroundColor: Colors.white.withOpacity(0.9),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
+                          backgroundColor:
+                          Colors.white
+                              .withOpacity(
+                              0.9),
+                          child:
+                          IconButton(
+                            padding:
+                            EdgeInsets.zero,
                             iconSize: 18,
-                            onPressed: () async {
-                              await provider.addFavorite(
+                            onPressed:
+                                () async {
+                              await provider
+                                  .addFavorite(
                                 context,
                                 snap,
                               );
                             },
                             icon: Icon(
-                              isFav ? Icons.favorite : Icons.favorite_border,
-                              color: isFav ? Colors.red : Colors.grey,
+                              isFav
+                                  ? Icons
+                                  .favorite
+                                  : Icons
+                                  .favorite_border,
+                              color: isFav
+                                  ? Colors.red
+                                  : Colors.grey,
                             ),
                           ),
                         ),
                       ),
+
+                      if (!isAvailable)
+                        Positioned(
+                          left: 6,
+                          bottom: 6,
+                          child: Container(
+                            padding:
+                            EdgeInsets
+                                .symmetric(
+                              horizontal: 7,
+                              vertical: 4,
+                            ),
+                            decoration:
+                            BoxDecoration(
+                              color:
+                              Colors.red,
+                              borderRadius:
+                              BorderRadius
+                                  .circular(
+                                  6),
+                            ),
+                            child: Text(
+                              "Unavailable",
+                              style:
+                              TextStyle(
+                                color: Colors
+                                    .white,
+                                fontSize: 9,
+                                fontWeight:
+                                FontWeight
+                                    .bold,
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
+
                   Padding(
-                    padding: EdgeInsets.all(8),
+                    padding:
+                    EdgeInsets.all(8),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
                       children: [
                         Text(
-                          data['pname']?.toString() ?? "",
+                          data['pname']
+                              ?.toString() ??
+                              "",
                           maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          overflow:
+                          TextOverflow
+                              .ellipsis,
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight:
+                            FontWeight.bold,
                             fontSize: 13,
                           ),
                         ),
+
                         SizedBox(height: 2),
+
                         Text(
-                          data['pcatogory']?.toString() ?? "",
+                          data['pcatogory']
+                              ?.toString() ??
+                              "",
                           maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          overflow:
+                          TextOverflow
+                              .ellipsis,
                           style: TextStyle(
                             fontSize: 11,
-                            color: Colors.grey.shade600,
+                            color: Colors
+                                .grey.shade600,
                           ),
                         ),
-                        SizedBox(height: 6),
+
+                        SizedBox(height: 3),
+
+                        if (!isAvailable)
+                          Text(
+                            "Currently Unavailable",
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 10,
+                              fontWeight:
+                              FontWeight.bold,
+                            ),
+                          ),
+
+                        SizedBox(height: 4),
+
                         Row(
                           children: [
                             Expanded(
                               child: Text(
                                 "₹${data['pselling price']?.toString() ?? '0'}",
                                 maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                overflow:
+                                TextOverflow
+                                    .ellipsis,
+                                style:
+                                TextStyle(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue.shade900,
+                                  fontWeight:
+                                  FontWeight
+                                      .bold,
+                                  color: Colors
+                                      .blue
+                                      .shade900,
                                 ),
                               ),
                             ),
+
                             InkWell(
-                              onTap: () async {
-                                await provider.addToCart(
+                              onTap:
+                              isAvailable
+                                  ? () async {
+                                await provider
+                                    .addToCart(
                                   context,
                                   snap,
                                 );
-                              },
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
+                              }
+                                  : null,
+                              borderRadius:
+                              BorderRadius
+                                  .circular(
+                                  8),
+                              child:
+                              Container(
+                                padding:
+                                EdgeInsets
+                                    .symmetric(
                                   horizontal: 8,
                                   vertical: 4,
                                 ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.blue,
+                                decoration:
+                                BoxDecoration(
+                                  borderRadius:
+                                  BorderRadius
+                                      .circular(
+                                      8),
+                                  color:
+                                  isAvailable
+                                      ? Colors
+                                      .blue
+                                      : Colors
+                                      .grey,
                                 ),
                                 child: Row(
-                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisSize:
+                                  MainAxisSize
+                                      .min,
                                   children: [
                                     Icon(
-                                      Icons.add,
-                                      size: 20,
-                                      color: Colors.white,
+                                      isAvailable
+                                          ? Icons
+                                          .add
+                                          : Icons
+                                          .block,
+                                      size: 18,
+                                      color: Colors
+                                          .white,
                                     ),
-                                    SizedBox(width: 2),
+                                    SizedBox(
+                                        width:
+                                        2),
                                     Text(
-                                      "Add",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
+                                      isAvailable
+                                          ? "Add"
+                                          : "Unavailable",
+                                      style:
+                                      TextStyle(
+                                        color: Colors
+                                            .white,
+                                        fontSize:
+                                        9,
+                                        fontWeight:
+                                        FontWeight
+                                            .bold,
                                       ),
                                     ),
                                   ],

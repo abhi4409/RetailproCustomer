@@ -14,30 +14,39 @@ class Catego extends StatefulWidget {
   });
 
   @override
-  State<Catego> createState() => _CategoState();
+  State<Catego> createState() =>
+      _CategoState();
 }
 
 class _CategoState extends State<Catego> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => CategoryViewmodel(
-        categoryIndex: widget.categoryIndex,
-      ),
-      child: Consumer<CategoryViewmodel>(
-        builder: (context, provider, child) {
+      create: (context) =>
+          CategoryViewmodel(
+            categoryIndex:
+            widget.categoryIndex,
+          ),
+      child:
+      Consumer<CategoryViewmodel>(
+        builder:
+            (context, provider, child) {
           return Scaffold(
-            backgroundColor: Colors.grey.shade100,
+            backgroundColor:
+            Colors.grey.shade100,
             appBar: AppBar(
               title: Text(
                 "Products Catalog",
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight:
+                  FontWeight.bold,
                   fontSize: 20,
                 ),
               ),
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
+              backgroundColor:
+              Colors.blue,
+              foregroundColor:
+              Colors.white,
               elevation: 0,
               actions: [
                 IconButton(
@@ -45,119 +54,208 @@ class _CategoState extends State<Catego> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Fevorates(),
+                        builder:
+                            (context) =>
+                            Fevorates(),
                       ),
                     );
                   },
                   icon: Icon(
                     Icons.favorite,
-                    color: Colors.red.shade300,
+                    color: Colors
+                        .red.shade300,
                     size: 26,
                   ),
                 ),
                 SizedBox(width: 8),
               ],
             ),
-            body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: provider.productStream,
-              builder: (context, snapshot) {
+            body: StreamBuilder<
+                QuerySnapshot<
+                    Map<String,
+                        dynamic>>>(
+              stream:
+              provider.productStream,
+              builder:
+                  (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child:
+                    CircularProgressIndicator(),
                   );
                 }
 
-                final docs = snapshot.data!.docs;
-                final filteredProducts = provider.filterProducts(docs);
+                final docs =
+                    snapshot.data!.docs;
+
+                final filteredProducts =
+                provider
+                    .filterProducts(
+                  docs,
+                );
 
                 return SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                  EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                    CrossAxisAlignment
+                        .start,
                     children: [
                       Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
+                        decoration:
+                        BoxDecoration(
+                          color:
+                          Colors.white,
+                          borderRadius:
+                          BorderRadius
+                              .circular(
+                              14),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
+                              color: Colors
+                                  .black
+                                  .withOpacity(
+                                  0.04),
                               blurRadius: 6,
-                              offset: Offset(0, 3),
+                              offset:
+                              Offset(
+                                  0,
+                                  3),
                             ),
                           ],
                         ),
                         child: TextField(
-                          onChanged: (value) {
-                            provider.searchProduct(value);
+                          onChanged:
+                              (value) {
+                            provider
+                                .searchProduct(
+                              value,
+                            );
                           },
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: Colors.blue,
+                          decoration:
+                          InputDecoration(
+                            prefixIcon:
+                            Icon(
+                              Icons
+                                  .search,
+                              color: Colors
+                                  .blue,
                             ),
-                            hintText: "Search products...",
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade500,
+                            hintText:
+                            "Search products...",
+                            hintStyle:
+                            TextStyle(
+                              fontSize:
+                              14,
+                              color: Colors
+                                  .grey
+                                  .shade500,
                             ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: 14,
-                              horizontal: 16,
+                            border:
+                            InputBorder
+                                .none,
+                            contentPadding:
+                            EdgeInsets
+                                .symmetric(
+                              vertical:
+                              14,
+                              horizontal:
+                              16,
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(height: 14),
+
+                      SizedBox(
+                          height: 14),
+
                       SizedBox(
                         height: 40,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: provider.categories.length,
-                          itemBuilder: (context, index) {
+                        child: ListView
+                            .builder(
+                          scrollDirection:
+                          Axis
+                              .horizontal,
+                          itemCount:
+                          provider
+                              .categories
+                              .length,
+                          itemBuilder:
+                              (context,
+                              index) {
                             final isSelected =
-                                provider.selectedCategory == index;
+                                provider
+                                    .selectedCategory ==
+                                    index;
 
                             return GestureDetector(
                               onTap: () {
-                                provider.changeCategory(index);
+                                provider
+                                    .changeCategory(
+                                  index,
+                                );
                               },
-                              child: Container(
-                                margin: EdgeInsets.only(right: 8),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
+                              child:
+                              Container(
+                                margin:
+                                EdgeInsets
+                                    .only(
+                                  right: 8,
                                 ),
-                                decoration: BoxDecoration(
+                                padding:
+                                EdgeInsets
+                                    .symmetric(
+                                  horizontal:
+                                  16,
+                                  vertical:
+                                  8,
+                                ),
+                                decoration:
+                                BoxDecoration(
                                   color: isSelected
-                                      ? Colors.blue
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
+                                      ? Colors
+                                      .blue
+                                      : Colors
+                                      .white,
+                                  borderRadius:
+                                  BorderRadius
+                                      .circular(
+                                      20),
+                                  border:
+                                  Border
+                                      .all(
                                     color: isSelected
-                                        ? Colors.blue
-                                        : Colors.grey.shade300,
+                                        ? Colors
+                                        .blue
+                                        : Colors
+                                        .grey
+                                        .shade300,
                                   ),
-                                  boxShadow: isSelected
-                                      ? [
-                                    BoxShadow(
-                                      color: Colors.blue.withOpacity(0.25),
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ]
-                                      : [],
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    provider.categories[index],
-                                    style: TextStyle(
+                                child:
+                                Center(
+                                  child:
+                                  Text(
+                                    provider
+                                        .categories[
+                                    index],
+                                    style:
+                                    TextStyle(
                                       color: isSelected
-                                          ? Colors.white
-                                          : Colors.grey.shade800,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
+                                          ? Colors
+                                          .white
+                                          : Colors
+                                          .grey
+                                          .shade800,
+                                      fontWeight:
+                                      FontWeight
+                                          .bold,
+                                      fontSize:
+                                      13,
                                     ),
                                   ),
                                 ),
@@ -166,76 +264,151 @@ class _CategoState extends State<Catego> {
                           },
                         ),
                       ),
-                      SizedBox(height: 16),
-                      filteredProducts.isEmpty
+
+                      SizedBox(
+                          height: 16),
+
+                      filteredProducts
+                          .isEmpty
                           ? Container(
-                        padding: EdgeInsets.symmetric(vertical: 60),
-                        alignment: Alignment.center,
-                        child: Column(
+                        padding:
+                        EdgeInsets
+                            .symmetric(
+                          vertical:
+                          60,
+                        ),
+                        alignment:
+                        Alignment
+                            .center,
+                        child:
+                        Column(
                           children: [
                             Icon(
-                              Icons.inventory_2_outlined,
+                              Icons
+                                  .inventory_2_outlined,
                               size: 54,
-                              color: Colors.grey.shade400,
+                              color: Colors
+                                  .grey
+                                  .shade400,
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(
+                                height:
+                                10),
                             Text(
                               "No products found",
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w500,
+                              style:
+                              TextStyle(
+                                fontSize:
+                                15,
+                                color: Colors
+                                    .grey
+                                    .shade600,
+                                fontWeight:
+                                FontWeight
+                                    .w500,
                               ),
                             ),
                           ],
                         ),
                       )
-                          : GridView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
+                          : GridView
+                          .builder(
+                        physics:
+                        NeverScrollableScrollPhysics(),
+                        shrinkWrap:
+                        true,
                         gridDelegate:
                         SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.72,
+                          crossAxisCount:
+                          2,
+                          crossAxisSpacing:
+                          12,
+                          mainAxisSpacing:
+                          12,
+                          childAspectRatio:
+                          0.68,
                         ),
-                        itemCount: filteredProducts.length,
-                        itemBuilder: (context, index) {
-                          final snap = filteredProducts[index];
-                          final data = snap.data();
+                        itemCount:
+                        filteredProducts
+                            .length,
+                        itemBuilder:
+                            (context,
+                            index) {
+                          final snap =
+                          filteredProducts[
+                          index];
+
+                          final data =
+                          snap.data();
+
                           final isFav =
-                          provider.favoriteIds.contains(snap.id);
+                          provider
+                              .favoriteIds
+                              .contains(
+                            snap.id,
+                          );
+
                           String image =
-                              data['pimage']?.toString() ?? "";
+                              data['pimage']
+                                  ?.toString() ??
+                                  "";
+
+                          int stockQuantity =
+                              int.tryParse(
+                                data['pquantity']?.toString() ??
+                                    '0',
+                              ) ??
+                                  0;
+
+                          bool isAvailable =
+                              stockQuantity >
+                                  0;
 
                           return Card(
-                            elevation: 1.5,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                            elevation:
+                            1.5,
+                            shape:
+                            RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius
+                                  .circular(
+                                  14),
                             ),
-                            clipBehavior: Clip.antiAlias,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
+                            clipBehavior:
+                            Clip
+                                .antiAlias,
+                            child:
+                            InkWell(
+                              onTap:
+                                  () {
+                                Navigator
+                                    .push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Detail(
-                                      snap: snap,
-                                    ),
+                                    builder: (context) =>
+                                        Detail(
+                                          snap:
+                                          snap,
+                                        ),
                                   ),
                                 );
                               },
-                              child: Column(
+                              child:
+                              Column(
                                 crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                CrossAxisAlignment
+                                    .start,
                                 children: [
                                   Expanded(
-                                    child: Stack(
-                                      fit: StackFit.expand,
+                                    child:
+                                    Stack(
+                                      fit: StackFit
+                                          .expand,
                                       children: [
                                         Container(
-                                          color: Colors.grey.shade50,
+                                          color: Colors
+                                              .grey
+                                              .shade50,
                                           child: image.isNotEmpty
                                               ? Image.network(
                                             image,
@@ -262,37 +435,79 @@ class _CategoState extends State<Catego> {
                                             ),
                                           ),
                                         ),
+
                                         Positioned(
-                                          top: 6,
-                                          right: 6,
-                                          child: CircleAvatar(
-                                            radius: 16,
-                                            backgroundColor:
-                                            Colors.white.withOpacity(0.9),
-                                            child: IconButton(
-                                              padding: EdgeInsets.zero,
-                                              iconSize: 18,
-                                              onPressed: () async {
+                                          top:
+                                          6,
+                                          right:
+                                          6,
+                                          child:
+                                          CircleAvatar(
+                                            radius:
+                                            16,
+                                            backgroundColor: Colors
+                                                .white
+                                                .withOpacity(0.9),
+                                            child:
+                                            IconButton(
+                                              padding:
+                                              EdgeInsets.zero,
+                                              iconSize:
+                                              18,
+                                              onPressed:
+                                                  () async {
                                                 await provider.addFavorite(
                                                   context,
                                                   snap,
                                                 );
                                               },
-                                              icon: Icon(
-                                                isFav
-                                                    ? Icons.favorite
-                                                    : Icons.favorite_border,
+                                              icon:
+                                              Icon(
+                                                isFav ? Icons.favorite : Icons.favorite_border,
                                                 color: Colors.red,
                                               ),
                                             ),
                                           ),
                                         ),
+
+                                        if (!isAvailable)
+                                          Positioned(
+                                            left:
+                                            6,
+                                            bottom:
+                                            6,
+                                            child:
+                                            Container(
+                                              padding:
+                                              EdgeInsets.symmetric(
+                                                horizontal: 7,
+                                                vertical: 4,
+                                              ),
+                                              decoration:
+                                              BoxDecoration(
+                                                color: Colors.red,
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              child:
+                                              Text(
+                                                "Unavailable",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                       ],
                                     ),
                                   ),
+
                                   Padding(
-                                    padding: EdgeInsets.all(10),
-                                    child: Column(
+                                    padding:
+                                    EdgeInsets.all(10),
+                                    child:
+                                    Column(
                                       crossAxisAlignment:
                                       CrossAxisAlignment.start,
                                       children: [
@@ -305,7 +520,25 @@ class _CategoState extends State<Catego> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        SizedBox(height: 6),
+
+                                        SizedBox(
+                                            height:
+                                            4),
+
+                                        if (!isAvailable)
+                                          Text(
+                                            "Currently Unavailable",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+
+                                        SizedBox(
+                                            height:
+                                            6),
+
                                         Row(
                                           mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -314,8 +547,7 @@ class _CategoState extends State<Catego> {
                                               child: Text(
                                                 "₹${data['pselling price']?.toString() ?? '0'}",
                                                 maxLines: 1,
-                                                overflow:
-                                                TextOverflow.ellipsis,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.bold,
@@ -323,42 +555,43 @@ class _CategoState extends State<Catego> {
                                                 ),
                                               ),
                                             ),
+
                                             InkWell(
-                                              onTap: () async {
+                                              onTap: isAvailable
+                                                  ? () async {
                                                 await provider.addToCart(
                                                   context,
                                                   snap,
                                                 );
-                                              },
+                                              }
+                                                  : null,
                                               borderRadius:
                                               BorderRadius.circular(8),
-                                              child: Container(
+                                              child:
+                                              Container(
                                                 padding: EdgeInsets.symmetric(
-                                                  horizontal: 10,
+                                                  horizontal: 8,
                                                   vertical: 6,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.blue,
-                                                  borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  color: isAvailable ? Colors.blue : Colors.grey,
+                                                  borderRadius: BorderRadius.circular(8),
                                                 ),
                                                 child: Row(
-                                                  mainAxisSize:
-                                                  MainAxisSize.min,
+                                                  mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     Icon(
-                                                      Icons.add,
+                                                      isAvailable ? Icons.add : Icons.block,
                                                       color: Colors.white,
                                                       size: 14,
                                                     ),
                                                     SizedBox(width: 2),
                                                     Text(
-                                                      "Add",
+                                                      isAvailable ? "Add" : "Unavailable",
                                                       style: TextStyle(
                                                         color: Colors.white,
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                        FontWeight.bold,
+                                                        fontSize: 9,
+                                                        fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
                                                   ],
@@ -376,7 +609,9 @@ class _CategoState extends State<Catego> {
                           );
                         },
                       ),
-                      SizedBox(height: 20),
+
+                      SizedBox(
+                          height: 20),
                     ],
                   ),
                 );

@@ -8,16 +8,22 @@ class HomeViewmodel extends ChangeNotifier {
   final HomeModels _model = HomeModels();
 
   final HomeRepository _repository = HomeRepository();
+
   String get searchText => _model.searchText;
+
   List<String> get favoriteIds => _model.favoriteIds;
+
   User? get user => _repository.getCurrentUser();
+
   Stream<QuerySnapshot<Map<String, dynamic>>> get productStream {
     return _repository.getProducts();
   }
+
   void searchProduct(String value) {
     _model.searchText = value;
     notifyListeners();
   }
+
   List<QueryDocumentSnapshot<Map<String, dynamic>>> filterProducts(
       List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
       ) {
@@ -32,10 +38,31 @@ class HomeViewmodel extends ChangeNotifier {
       );
     }).toList();
   }
+
   Future<void> addToCart(
       BuildContext context,
       QueryDocumentSnapshot<Map<String, dynamic>> snap,
       ) async {
+    var data = snap.data();
+
+    int stockQuantity =
+        int.tryParse(
+          data['pquantity']?.toString() ?? '0',
+        ) ??
+            0;
+
+    if (stockQuantity <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "This product is currently unavailable",
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     var user = _repository.getCurrentUser();
 
     if (user == null) {
@@ -59,9 +86,27 @@ class HomeViewmodel extends ChangeNotifier {
       var cartData = item.data();
 
       int oldQty =
-          int.tryParse(cartData['qty']?.toString() ?? '0') ?? 0;
+          int.tryParse(
+            cartData['qty']?.toString() ?? '0',
+          ) ??
+              0;
 
       int newQty = oldQty + 1;
+
+      if (newQty > stockQuantity) {
+        if (!context.mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Only $stockQuantity items available",
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        return;
+      }
 
       await _repository.updateCartQty(
         item.id,
@@ -77,8 +122,6 @@ class HomeViewmodel extends ChangeNotifier {
         ),
       );
     } else {
-      var data = snap.data();
-
       await _repository.addCart({
         'uid': uid,
         'productId': snap.id,
@@ -132,7 +175,9 @@ class HomeViewmodel extends ChangeNotifier {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Already added to favorites"),
+          content: Text(
+            "Already added to favorites",
+          ),
         ),
       );
     } else {
@@ -147,13 +192,16 @@ class HomeViewmodel extends ChangeNotifier {
       });
 
       _model.favoriteIds.add(snap.id);
+
       notifyListeners();
 
       if (!context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Added to favorites"),
+          content: Text(
+            "Added to favorites",
+          ),
           backgroundColor: Colors.green,
         ),
       );
