@@ -43,9 +43,7 @@ class OrderServices {
   Stream<DocumentSnapshot<Map<String, dynamic>>> orderDetailsStream(
       String orderId,
       ) {
-    return orders
-        .doc(orderId)
-        .snapshots();
+    return orders.doc(orderId).snapshots();
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getAddresses(
@@ -79,24 +77,19 @@ class OrderServices {
     String orderNo =
         "OD-${ref.id.substring(0, 6).toUpperCase()}";
 
-    data['orderNo'] =
-        orderNo;
+    data['orderId'] = ref.id;
+    data['orderNo'] = orderNo;
+    data['date'] = FieldValue.serverTimestamp();
+    data['createdAt'] = FieldValue.serverTimestamp();
 
-    data['date'] =
-        FieldValue.serverTimestamp();
-
-    await ref.set(
-      data,
-    );
+    await ref.set(data);
   }
 
   Future<void> updateCartQty(
       String id,
       double qty,
       ) async {
-    await cart
-        .doc(id)
-        .update({
+    await cart.doc(id).update({
       'qty': qty,
     });
   }
@@ -104,9 +97,7 @@ class OrderServices {
   Future<void> deleteCartItem(
       String id,
       ) async {
-    await cart
-        .doc(id)
-        .delete();
+    await cart.doc(id).delete();
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getCart(

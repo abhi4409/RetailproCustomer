@@ -4,8 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../services/order_service.dart';
 
 class OrderRepository {
-  final OrderServices _services =
-  OrderServices();
+  final OrderServices _services = OrderServices();
 
   User? getCurrentUser() {
     return _services.getCurrentUser();
@@ -14,49 +13,37 @@ class OrderRepository {
   Stream<QuerySnapshot<Map<String, dynamic>>> cartStream(
       String uid,
       ) {
-    return _services.cartStream(
-      uid,
-    );
+    return _services.cartStream(uid);
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> orderStream(
       String uid,
       ) {
-    return _services.orderStream(
-      uid,
-    );
+    return _services.orderStream(uid);
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> orderDetailsStream(
       String orderId,
       ) {
-    return _services.orderDetailsStream(
-      orderId,
-    );
+    return _services.orderDetailsStream(orderId);
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getAddresses(
       String uid,
       ) async {
-    return await _services.getAddresses(
-      uid,
-    );
+    return await _services.getAddresses(uid);
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getCustomerDetails(
       String email,
       ) async {
-    return await _services.getCustomerDetails(
-      email,
-    );
+    return await _services.getCustomerDetails(email);
   }
 
   Future<void> createOrder(
       Map<String, dynamic> data,
       ) async {
-    await _services.createOrder(
-      data,
-    );
+    await _services.createOrder(data);
   }
 
   Future<void> updateCartQty(
@@ -72,16 +59,12 @@ class OrderRepository {
   Future<void> deleteCartItem(
       String id,
       ) async {
-    await _services.deleteCartItem(
-      id,
-    );
+    await _services.deleteCartItem(id);
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getCart(
       String uid,
       ) async {
-    return await _services.getCart(
-      uid,
-    );
+    return await _services.getCart(uid);
   }
 }
