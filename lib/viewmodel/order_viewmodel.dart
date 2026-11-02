@@ -1,258 +1,853 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../Model/order_model.dart';
-import '../repository/order_repo.dart';
+
+import '../repository/address_repo.dart';
 
 class OrderViewmodel extends ChangeNotifier {
-  final OrderModels _model = OrderModels();
-  final OrderRepository _repository = OrderRepository();
+  final FirebaseFirestore firestore =
+      FirebaseFirestore.instance;
 
-  String get address => _model.address;
-  String get customerName => _model.customerName;
-  String get customerPhone => _model.customerPhone;
-  String get paymentMethod => _model.paymentMethod;
-  User? get user => _repository.getCurrentUser();
+  final FirebaseAuth auth =
+      FirebaseAuth.instance;
+
+  final AddressRepository _addressRepository =
+  AddressRepository();
+
+  User? get user => auth.currentUser;
+
+  String address = "No address selected";
+
+  String paymentMethod = "UPI";
+
+  bool isLoading = false;
 
   Future<void> loadOrderData() async {
     await getAddress();
-    await getCustomerDetails();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> cartStream(String uid) {
-    return _repository.cartStream(uid);
+  void changePayment(String value) {
+    paymentMethod = value;
+    notifyListeners();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> orderStream(String uid) {
-    return _repository.orderStream(uid);
+  double getDouble(dynamic value) {
+    return double.tryParse(
+      value?.toString() ?? "0",
+    ) ??
+        0.0;
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> orderDetailsStream(
+  bool isKgProduct(dynamic unit) {
+    String value =
+        unit?.toString().trim().toLowerCase() ?? "";
+
+    return value == "kg" ||
+        value == "kgs" ||
+        value == "kilogram" ||
+        value == "kilograms";
+  }
+
+  double normalizeQty(double value) {
+    return double.parse(
+      value.toStringAsFixed(1),
+    );
+  }
+
+  String displayQty(double value) {
+    double qty =
+    normalizeQty(value);
+
+    if (qty ==
+        qty.roundToDouble()) {
+      return qty
+          .toInt()
+          .toString();
+    }
+
+    return qty.toStringAsFixed(1);
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>
+  cartStream(
+      String uid,
+      ) {
+    return firestore
+        .collection('cart')
+        .where(
+      'uid',
+      isEqualTo: uid,
+    )
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>
+  orderStream(
+      String uid,
+      ) {
+    return firestore
+        .collection('orders')
+        .where(
+      'uid',
+      isEqualTo: uid,
+    )
+        .snapshots();
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>>
+  orderDetailsStream(
       String orderId,
       ) {
-    return _repository.orderDetailsStream(orderId);
+    return firestore
+        .collection('orders')
+        .doc(orderId)
+        .snapshots();
+  }
+
+  String getDate(dynamic value) {
+    if (value == null) {
+      return "";
+    }
+
+    DateTime? date;
+
+    if (value is Timestamp) {
+      date = value.toDate();
+    } else if (value is DateTime) {
+      date = value;
+    } else {
+      date = DateTime.tryParse(
+        value.toString(),
+      );
+    }
+
+    if (date == null) {
+      return "";
+    }
+
+    String day =
+    date.day
+        .toString()
+        .padLeft(
+      2,
+      '0',
+    );
+
+    String month =
+    date.month
+        .toString()
+        .padLeft(
+      2,
+      '0',
+    );
+
+    String year =
+    date.year.toString();
+
+    return "$day/$month/$year";
+  }
+
+  bool placed(String status) {
+    String value =
+    status
+        .trim()
+        .toLowerCase();
+
+    return value == "pending" ||
+        value == "placed" ||
+        value == "accept" ||
+        value == "accepted" ||
+        value == "ready" ||
+        value == "completed";
+  }
+
+  bool accepted(String status) {
+    String value =
+    status
+        .trim()
+        .toLowerCase();
+
+    return value == "accept" ||
+        value == "accepted" ||
+        value == "ready" ||
+        value == "completed";
+  }
+
+  bool ready(String status) {
+    String value =
+    status
+        .trim()
+        .toLowerCase();
+
+    return value == "ready" ||
+        value == "completed";
+  }
+
+  bool completed(String status) {
+    return status
+        .trim()
+        .toLowerCase() ==
+        "completed";
+  }
+
+  double getItemsTotal(
+      List<QueryDocumentSnapshot<
+          Map<String, dynamic>>>
+      docs,
+      ) {
+    double total = 0.0;
+
+    for (var snap in docs) {
+      Map<String, dynamic> data =
+      snap.data();
+
+      double price =
+      getDouble(
+        data['price'],
+      );
+
+      double qty =
+      getDouble(
+        data['qty'],
+      );
+
+      total += price * qty;
+    }
+
+    return total;
+  }
+
+  double getDeliveryCharge(
+      List<QueryDocumentSnapshot<
+          Map<String, dynamic>>>
+      docs,
+      ) {
+    if (docs.isEmpty) {
+      return 0.0;
+    }
+
+    return 40.0;
+  }
+
+  double getTotalAmount(
+      double itemsTotal,
+      double deliveryCharge,
+      ) {
+    return itemsTotal +
+        deliveryCharge;
+  }
+
+  Future<double> getProductStock(
+      String productId,
+      ) async {
+    try {
+      DocumentSnapshot<
+          Map<String, dynamic>>
+      product =
+      await firestore
+          .collection(
+        'productsdata',
+      )
+          .doc(productId)
+          .get();
+
+      if (!product.exists) {
+        return 0.0;
+      }
+
+      Map<String, dynamic>? data =
+      product.data();
+
+      if (data == null) {
+        return 0.0;
+      }
+
+      return getDouble(
+        data['pquantity'],
+      );
+    } catch (e) {
+      print(e);
+      return 0.0;
+    }
+  }
+
+  Future<void> increaseQty(
+      QueryDocumentSnapshot<
+          Map<String, dynamic>>
+      snap,
+      ) async {
+    try {
+      Map<String, dynamic> data =
+      snap.data();
+
+      double currentQty =
+      getDouble(
+        data['qty'],
+      );
+
+      bool kgProduct =
+      isKgProduct(
+        data['unit'],
+      );
+
+      double step =
+      kgProduct
+          ? 0.1
+          : 1.0;
+
+      double newQty =
+      normalizeQty(
+        currentQty + step,
+      );
+
+      String productId =
+          data['productId']
+              ?.toString() ??
+              "";
+
+      if (productId.isEmpty) {
+        return;
+      }
+
+      double stock =
+      await getProductStock(
+        productId,
+      );
+
+      if (stock <= 0) {
+        return;
+      }
+
+      if (newQty > stock) {
+        return;
+      }
+
+      await firestore
+          .collection('cart')
+          .doc(snap.id)
+          .update({
+        'qty': newQty,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> decreaseQty(
+      QueryDocumentSnapshot<
+          Map<String, dynamic>>
+      snap,
+      ) async {
+    try {
+      Map<String, dynamic> data =
+      snap.data();
+
+      double currentQty =
+      getDouble(
+        data['qty'],
+      );
+
+      bool kgProduct =
+      isKgProduct(
+        data['unit'],
+      );
+
+      double step =
+      kgProduct
+          ? 0.1
+          : 1.0;
+
+      double minimumQty =
+      kgProduct
+          ? 0.1
+          : 1.0;
+
+      double newQty =
+      normalizeQty(
+        currentQty - step,
+      );
+
+      if (newQty <
+          minimumQty) {
+        return;
+      }
+
+      await firestore
+          .collection('cart')
+          .doc(snap.id)
+          .update({
+        'qty': newQty,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> deleteItem(
+      String id,
+      ) async {
+    try {
+      await firestore
+          .collection('cart')
+          .doc(id)
+          .delete();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> clearCart(
+      String uid,
+      ) async {
+    try {
+      QuerySnapshot<
+          Map<String, dynamic>>
+      snapshot =
+      await firestore
+          .collection('cart')
+          .where(
+        'uid',
+        isEqualTo: uid,
+      )
+          .get();
+
+      WriteBatch batch =
+      firestore.batch();
+
+      for (var doc
+      in snapshot.docs) {
+        batch.delete(
+          doc.reference,
+        );
+      }
+
+      await batch.commit();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> getAddress() async {
-    final currentUser = _repository.getCurrentUser();
-    if (currentUser == null) return;
+    User? currentUser =
+    _addressRepository
+        .getCurrentUser();
 
-    final data = await _repository.getAddresses(currentUser.uid);
+    if (currentUser == null) {
+      address =
+      "No address selected";
 
-    if (data.docs.isEmpty) {
-      _model.address = "Add delivery address";
       notifyListeners();
       return;
     }
 
-    var selectedAddress = data.docs.first;
+    try {
+      QuerySnapshot<
+          Map<String, dynamic>>
+      snapshot =
+      await _addressRepository
+          .getUserAddresses(
+        currentUser.uid,
+      );
 
-    for (final item in data.docs) {
-      final addressData = item.data();
-      if (addressData['isDefault'] == true) {
-        selectedAddress = item;
-        break;
+      print(
+        "ADDRESS COUNT: ${snapshot.docs.length}",
+      );
+
+      if (snapshot.docs.isEmpty) {
+        address =
+        "No address selected";
+
+        notifyListeners();
+        return;
       }
-    }
 
-    final addressData = selectedAddress.data();
-    final String savedAddress = addressData['address']?.toString() ?? "";
-    final String city = addressData['city']?.toString() ?? "";
+      QueryDocumentSnapshot<
+          Map<String, dynamic>>?
+      defaultAddress;
 
-    _model.address = "$savedAddress, $city";
-    notifyListeners();
-  }
+      for (var doc
+      in snapshot.docs) {
+        Map<String, dynamic> data =
+        doc.data();
 
-  Future<void> getCustomerDetails() async {
-    final currentUser = _repository.getCurrentUser();
-    if (currentUser == null) return;
+        print(
+          "ADDRESS DATA: $data",
+        );
 
-    final String userEmail = currentUser.email ?? "";
-    if (userEmail.isEmpty) return;
+        bool isDefault =
+            data['isDefault'] ==
+                true;
 
-    final data = await _repository.getCustomerDetails(userEmail);
+        if (isDefault) {
+          defaultAddress =
+              doc;
+          break;
+        }
+      }
 
-    if (data.docs.isNotEmpty) {
-      final customer = data.docs.first.data();
-      _model.customerName = customer['name']?.toString() ?? "";
-      _model.customerPhone = customer['phone']?.toString() ?? "";
+      if (defaultAddress ==
+          null) {
+        address =
+        "No address selected";
+
+        notifyListeners();
+        return;
+      }
+
+      Map<String, dynamic> data =
+      defaultAddress.data();
+
+      String street =
+          data['address']
+              ?.toString()
+              .trim() ??
+              "";
+
+      String city =
+          data['city']
+              ?.toString()
+              .trim() ??
+              "";
+
+      if (street.isNotEmpty &&
+          city.isNotEmpty) {
+        address =
+        "$street, $city";
+      } else if (street.isNotEmpty) {
+        address =
+            street;
+      } else if (city.isNotEmpty) {
+        address =
+            city;
+      } else {
+        address =
+        "No address selected";
+      }
+
+      print(
+        "SELECTED ADDRESS: $address",
+      );
+
+      notifyListeners();
+    } catch (e) {
+      print(
+        "GET ADDRESS ERROR: $e",
+      );
+
+      address =
+      "No address selected";
+
       notifyListeners();
     }
   }
 
-  void changePayment(String value) {
-    _model.paymentMethod = value;
-    notifyListeners();
+  bool hasAddress() {
+    String value =
+    address.trim();
+
+    return value.isNotEmpty &&
+        value.toLowerCase() !=
+            "no address selected";
   }
 
-  double getItemsTotal(List<QueryDocumentSnapshot<Map<String, dynamic>>> docs) {
-    double itemsTotal = 0.0;
+  Future<bool> checkStock(
+      BuildContext context,
+      List<QueryDocumentSnapshot<
+          Map<String, dynamic>>>
+      docs,
+      ) async {
+    for (var snap in docs) {
+      Map<String, dynamic> data =
+      snap.data();
 
-    for (final item in docs) {
-      final data = item.data();
-      final double price =
-          double.tryParse(data['price']?.toString() ?? "0") ?? 0.0;
-      final int qty = int.tryParse(data['qty']?.toString() ?? "0") ?? 0;
+      String productId =
+          data['productId']
+              ?.toString() ??
+              "";
 
-      itemsTotal += (price * qty);
+      String productName =
+          data['pname']
+              ?.toString() ??
+              "Product";
+
+      double orderQty =
+      getDouble(
+        data['qty'],
+      );
+
+      bool kgProduct =
+      isKgProduct(
+        data['unit'],
+      );
+
+      if (productId.isEmpty) {
+        continue;
+      }
+
+      double stock =
+      await getProductStock(
+        productId,
+      );
+
+      if (stock <= 0) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(
+            SnackBar(
+              content: Text(
+                "$productName is currently unavailable",
+              ),
+              backgroundColor:
+              Colors.red,
+            ),
+          );
+        }
+
+        return false;
+      }
+
+      if (orderQty > stock) {
+        if (context.mounted) {
+          String available;
+
+          if (kgProduct) {
+            available =
+            "${displayQty(stock)} KG";
+          } else {
+            available =
+                displayQty(stock);
+          }
+
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Only $available of $productName available",
+              ),
+              backgroundColor:
+              Colors.red,
+            ),
+          );
+        }
+
+        return false;
+      }
     }
 
-    return itemsTotal;
-  }
-
-  double getDeliveryCharge(List docs) {
-    if (docs.isEmpty) return 0.0;
-    return 30.0;
-  }
-
-  double getTotalAmount(double itemsTotal, double deliveryCharge) {
-    return itemsTotal + deliveryCharge;
+    return true;
   }
 
   Future<void> placeOrder(
       BuildContext context,
-      List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+      List<QueryDocumentSnapshot<
+          Map<String, dynamic>>>
+      docs,
       double itemsTotal,
       double deliveryCharge,
       double totalAmount,
       String uid,
       ) async {
     if (docs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(
         SnackBar(
-          content: Text("Cart is empty"),
-          backgroundColor: Colors.red,
+          content: Text(
+            "Cart is empty",
+          ),
+          backgroundColor:
+          Colors.red,
         ),
       );
+
       return;
     }
 
-    if (_model.address.isEmpty ||
-        _model.address == "Add delivery address") {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please add delivery address"),
-          backgroundColor: Colors.red,
-        ),
-      );
+    await getAddress();
+
+    if (!hasAddress()) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Please select a default delivery address",
+            ),
+            backgroundColor:
+            Colors.red,
+          ),
+        );
+      }
+
       return;
     }
 
-    final List<Map<String, dynamic>> items = [];
+    if (isLoading) {
+      return;
+    }
 
-    for (final item in docs) {
-      final data = item.data();
-      items.add({
-        'productId': data['productId']?.toString() ?? "",
-        'pname': data['pname']?.toString() ?? "",
-        'price': data['price'] ?? 0,
-        'qty': data['qty'] ?? 1,
-        'unit': data['unit']?.toString() ?? "",
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      bool available =
+      await checkStock(
+        context,
+        docs,
+      );
+
+      if (!available) {
+        return;
+      }
+
+      List<Map<String, dynamic>>
+      items = [];
+
+      for (var snap
+      in docs) {
+        Map<String, dynamic> data =
+        snap.data();
+
+        double price =
+        getDouble(
+          data['price'],
+        );
+
+        double qty =
+        getDouble(
+          data['qty'],
+        );
+
+        items.add({
+          'productId':
+          data['productId']
+              ?.toString() ??
+              "",
+          'pname':
+          data['pname']
+              ?.toString() ??
+              "",
+          'price':
+          price,
+          'qty':
+          qty,
+          'unit':
+          data['unit']
+              ?.toString() ??
+              "",
+          'pcatogory':
+          data['pcatogory']
+              ?.toString() ??
+              "",
+        });
+      }
+
+      DocumentReference<
+          Map<String, dynamic>>
+      orderDoc =
+      firestore
+          .collection(
+        'orders',
+      )
+          .doc();
+
+      String id =
+          orderDoc.id;
+
+      String orderNo;
+
+      if (id.length >= 6) {
+        orderNo =
+        "OD-${id.substring(0, 6).toUpperCase()}";
+      } else {
+        orderNo =
+        "OD-${id.toUpperCase()}";
+      }
+
+      await orderDoc.set({
+        'orderId':
+        orderDoc.id,
+        'orderNo':
+        orderNo,
+        'uid':
+        uid,
+        'userId':
+        uid,
+        'items':
+        items,
+        'itemsTotal':
+        itemsTotal,
+        'deliveryCharge':
+        deliveryCharge,
+        'totalAmount':
+        totalAmount,
+        'address':
+        address,
+        'paymentMethod':
+        paymentMethod,
+        'status':
+        'Pending',
+        'stockDeducted':
+        false,
+        'date':
+        FieldValue
+            .serverTimestamp(),
+        'createdAt':
+        FieldValue
+            .serverTimestamp(),
       });
+
+      WriteBatch batch =
+      firestore.batch();
+
+      for (var snap
+      in docs) {
+        batch.delete(
+          snap.reference,
+        );
+      }
+
+      await batch.commit();
+
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Order placed successfully",
+          ),
+          backgroundColor:
+          Colors.green,
+        ),
+      );
+    } catch (e) {
+      print(
+        "PLACE ORDER ERROR: $e",
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to place order",
+            ),
+            backgroundColor:
+            Colors.red,
+          ),
+        );
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
-
-    await _repository.createOrder({
-      'uid': uid,
-      'customerName': _model.customerName,
-      'customerPhone': _model.customerPhone,
-      'items': items,
-      'itemsTotal': itemsTotal,
-      'deliveryCharge': deliveryCharge,
-      'totalAmount': totalAmount,
-      'address': _model.address,
-      'paymentMethod': _model.paymentMethod,
-      'status': 'Order Placed',
-    });
-
-    await clearCart(uid);
-
-    if (!context.mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Order placed successfully"),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
-  Future<void> increaseQty(
-      QueryDocumentSnapshot<Map<String, dynamic>> snap,
-      ) async {
-    final data = snap.data();
-    final int qty = int.tryParse(data['qty']?.toString() ?? "0") ?? 0;
-
-    await _repository.updateCartQty(snap.id, qty + 1);
-  }
-
-  Future<void> decreaseQty(
-      QueryDocumentSnapshot<Map<String, dynamic>> snap,
-      ) async {
-    final data = snap.data();
-    final int qty = int.tryParse(data['qty']?.toString() ?? "0") ?? 0;
-
-    if (qty > 1) {
-      await _repository.updateCartQty(snap.id, qty - 1);
-    }
-  }
-
-  Future<void> deleteItem(String id) async {
-    await _repository.deleteCartItem(id);
-  }
-
-  Future<void> clearCart(String uid) async {
-    final data = await _repository.getCart(uid);
-
-    for (final item in data.docs) {
-      await _repository.deleteCartItem(item.id);
-    }
-  }
-
-  String getDate(dynamic value) {
-    if (value == null) return "";
-
-    if (value is Timestamp) {
-      final DateTime date = value.toDate();
-      const List<String> months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-
-      return "${date.day.toString().padLeft(2, '0')} ${months[date.month - 1]} ${date.year}";
-    }
-
-    return value.toString();
-  }
-
-  bool placed(String status) {
-    return status == "Order Placed" ||
-        status == "Accepted" ||
-        status == "Ready" ||
-        status == "Completed" ||
-        status == "Rejected";
-  }
-
-  bool accepted(String status) {
-    return status == "Accepted" ||
-        status == "Ready" ||
-        status == "Completed";
-  }
-
-  bool ready(String status) {
-    return status == "Ready" || status == "Completed";
-  }
-
-  bool completed(String status) {
-    return status == "Completed";
   }
 }
