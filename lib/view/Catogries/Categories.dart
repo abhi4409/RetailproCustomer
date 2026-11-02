@@ -28,7 +28,8 @@ class _CategoState extends State<Catego> {
             categoryIndex:
             widget.categoryIndex,
           ),
-      child: Consumer<CategoryViewmodel>(
+      child:
+      Consumer<CategoryViewmodel>(
         builder:
             (context, provider, child) {
           return Scaffold(
@@ -89,8 +90,7 @@ class _CategoState extends State<Catego> {
                     snapshot.data!.docs;
 
                 final filteredProducts =
-                provider
-                    .filterProducts(
+                provider.filterProducts(
                   docs,
                 );
 
@@ -113,18 +113,21 @@ class _CategoState extends State<Catego> {
                           borderRadius:
                           BorderRadius
                               .circular(
-                              14),
+                            14,
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors
                                   .black
                                   .withOpacity(
-                                  0.04),
+                                0.04,
+                              ),
                               blurRadius: 6,
                               offset:
                               Offset(
-                                  0,
-                                  3),
+                                0,
+                                3,
+                              ),
                             ),
                           ],
                         ),
@@ -140,8 +143,7 @@ class _CategoState extends State<Catego> {
                           InputDecoration(
                             prefixIcon:
                             Icon(
-                              Icons
-                                  .search,
+                              Icons.search,
                               color: Colors
                                   .blue,
                             ),
@@ -149,8 +151,7 @@ class _CategoState extends State<Catego> {
                             "Search products...",
                             hintStyle:
                             TextStyle(
-                              fontSize:
-                              14,
+                              fontSize: 14,
                               color: Colors
                                   .grey
                                   .shade500,
@@ -161,10 +162,8 @@ class _CategoState extends State<Catego> {
                             contentPadding:
                             EdgeInsets
                                 .symmetric(
-                              vertical:
-                              14,
-                              horizontal:
-                              16,
+                              vertical: 14,
+                              horizontal: 16,
                             ),
                           ),
                         ),
@@ -196,7 +195,8 @@ class _CategoState extends State<Catego> {
                                   index,
                                 );
                               },
-                              child: Container(
+                              child:
+                              Container(
                                 margin:
                                 EdgeInsets
                                     .only(
@@ -207,8 +207,7 @@ class _CategoState extends State<Catego> {
                                     .symmetric(
                                   horizontal:
                                   16,
-                                  vertical:
-                                  8,
+                                  vertical: 8,
                                 ),
                                 decoration:
                                 BoxDecoration(
@@ -220,7 +219,8 @@ class _CategoState extends State<Catego> {
                                   borderRadius:
                                   BorderRadius
                                       .circular(
-                                      20),
+                                    20,
+                                  ),
                                   border:
                                   Border.all(
                                     color: isSelected
@@ -266,14 +266,12 @@ class _CategoState extends State<Catego> {
                         padding:
                         EdgeInsets
                             .symmetric(
-                          vertical:
-                          60,
+                          vertical: 60,
                         ),
                         alignment:
                         Alignment
                             .center,
-                        child:
-                        Column(
+                        child: Column(
                           children: [
                             Icon(
                               Icons
@@ -284,8 +282,8 @@ class _CategoState extends State<Catego> {
                                   .shade400,
                             ),
                             SizedBox(
-                                height:
-                                10),
+                              height: 10,
+                            ),
                             Text(
                               "No products found",
                               style:
@@ -303,7 +301,8 @@ class _CategoState extends State<Catego> {
                           ],
                         ),
                       )
-                          : GridView.builder(
+                          : GridView
+                          .builder(
                         physics:
                         NeverScrollableScrollPhysics(),
                         shrinkWrap:
@@ -317,7 +316,7 @@ class _CategoState extends State<Catego> {
                           mainAxisSpacing:
                           12,
                           childAspectRatio:
-                          0.68,
+                          0.62,
                         ),
                         itemCount:
                         filteredProducts
@@ -344,13 +343,9 @@ class _CategoState extends State<Catego> {
                                   ?.toString() ??
                                   "";
 
-                          // IMPORTANT:
-                          // double supports KG stock:
-                          // 0.1, 0.2, 0.5 etc.
                           double
                           stockQuantity =
-                              double
-                                  .tryParse(
+                              double.tryParse(
                                 data['pquantity']
                                     ?.toString() ??
                                     '0',
@@ -370,7 +365,8 @@ class _CategoState extends State<Catego> {
                               borderRadius:
                               BorderRadius
                                   .circular(
-                                  14),
+                                14,
+                              ),
                             ),
                             clipBehavior:
                             Clip
@@ -391,7 +387,8 @@ class _CategoState extends State<Catego> {
                                   ),
                                 );
                               },
-                              child: Column(
+                              child:
+                              Column(
                                 crossAxisAlignment:
                                 CrossAxisAlignment
                                     .start,
@@ -440,17 +437,20 @@ class _CategoState extends State<Catego> {
                                           child:
                                           CircleAvatar(
                                             radius:
-                                            16,
+                                            20,
                                             backgroundColor: Colors
                                                 .white
                                                 .withOpacity(
-                                                0.9),
+                                              0.95,
+                                            ),
                                             child:
                                             IconButton(
                                               padding:
                                               EdgeInsets.zero,
+                                              constraints:
+                                              BoxConstraints(),
                                               iconSize:
-                                              18,
+                                              24,
                                               onPressed:
                                                   () async {
                                                 await provider.addFavorite(
@@ -463,8 +463,9 @@ class _CategoState extends State<Catego> {
                                                 isFav
                                                     ? Icons.favorite
                                                     : Icons.favorite_border,
-                                                color:
-                                                Colors.red,
+                                                color: isFav
+                                                    ? Colors.red
+                                                    : Colors.grey,
                                               ),
                                             ),
                                           ),
@@ -490,7 +491,9 @@ class _CategoState extends State<Catego> {
                                                 color:
                                                 Colors.red,
                                                 borderRadius:
-                                                BorderRadius.circular(6),
+                                                BorderRadius.circular(
+                                                  6,
+                                                ),
                                               ),
                                               child:
                                               Text(
@@ -515,7 +518,8 @@ class _CategoState extends State<Catego> {
                                     padding:
                                     EdgeInsets
                                         .all(
-                                        10),
+                                      10,
+                                    ),
                                     child:
                                     Column(
                                       crossAxisAlignment:
@@ -539,8 +543,9 @@ class _CategoState extends State<Catego> {
                                         ),
 
                                         SizedBox(
-                                            height:
-                                            4),
+                                          height:
+                                          4,
+                                        ),
 
                                         if (!isAvailable)
                                           Text(
@@ -557,12 +562,11 @@ class _CategoState extends State<Catego> {
                                           ),
 
                                         SizedBox(
-                                            height:
-                                            6),
+                                          height:
+                                          8,
+                                        ),
 
                                         Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
                                           children: [
                                             Expanded(
                                               child:
@@ -584,6 +588,11 @@ class _CategoState extends State<Catego> {
                                               ),
                                             ),
 
+                                            SizedBox(
+                                              width:
+                                              4,
+                                            ),
+
                                             InkWell(
                                               onTap: isAvailable
                                                   ? () async {
@@ -594,15 +603,17 @@ class _CategoState extends State<Catego> {
                                               }
                                                   : null,
                                               borderRadius:
-                                              BorderRadius.circular(8),
+                                              BorderRadius.circular(
+                                                10,
+                                              ),
                                               child:
                                               Container(
                                                 padding:
                                                 EdgeInsets.symmetric(
                                                   horizontal:
-                                                  8,
+                                                  10,
                                                   vertical:
-                                                  6,
+                                                  9,
                                                 ),
                                                 decoration:
                                                 BoxDecoration(
@@ -610,7 +621,9 @@ class _CategoState extends State<Catego> {
                                                       ? Colors.blue
                                                       : Colors.grey,
                                                   borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  BorderRadius.circular(
+                                                    10,
+                                                  ),
                                                 ),
                                                 child:
                                                 Row(
@@ -618,18 +631,30 @@ class _CategoState extends State<Catego> {
                                                   MainAxisSize.min,
                                                   children: [
                                                     Icon(
-                                                      isAvailable ? Icons.add : Icons.block,
-                                                      color: Colors.white,
-                                                      size: 14,
+                                                      isAvailable
+                                                          ? Icons.add_shopping_cart
+                                                          : Icons.block,
+                                                      color:
+                                                      Colors.white,
+                                                      size:
+                                                      20,
                                                     ),
                                                     SizedBox(
-                                                        width: 2),
+                                                      width:
+                                                      4,
+                                                    ),
                                                     Text(
-                                                      isAvailable ? "Add" : "Unavailable",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 9,
-                                                        fontWeight: FontWeight.bold,
+                                                      isAvailable
+                                                          ? "Add"
+                                                          : "Unavailable",
+                                                      style:
+                                                      TextStyle(
+                                                        color:
+                                                        Colors.white,
+                                                        fontSize:
+                                                        isAvailable ? 12 : 9,
+                                                        fontWeight:
+                                                        FontWeight.bold,
                                                       ),
                                                     ),
                                                   ],

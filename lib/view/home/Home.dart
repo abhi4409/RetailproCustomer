@@ -55,7 +55,8 @@ class _HomState extends State<Hom> {
           SizedBox(width: 8),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      body: StreamBuilder<
+          QuerySnapshot<Map<String, dynamic>>>(
         stream: provider.productStream,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -355,7 +356,7 @@ class _HomState extends State<Hom> {
     }
 
     return SizedBox(
-      height: 235,
+      height: 250,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: filteredProducts.length,
@@ -372,6 +373,7 @@ class _HomState extends State<Hom> {
 
           String image =
               data['pimage']?.toString() ?? "";
+
           double stockQuantity =
               double.tryParse(
                 data['pquantity']
@@ -396,7 +398,7 @@ class _HomState extends State<Hom> {
               );
             },
             child: Container(
-              width: 155,
+              width: 170,
               margin:
               EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
@@ -420,7 +422,7 @@ class _HomState extends State<Hom> {
                     children: [
                       Container(
                         width: double.infinity,
-                        height: 110,
+                        height: 115,
                         decoration:
                         BoxDecoration(
                           color: Colors
@@ -430,7 +432,8 @@ class _HomState extends State<Hom> {
                               .vertical(
                             top:
                             Radius.circular(
-                                14),
+                              14,
+                            ),
                           ),
                         ),
                         child: ClipRRect(
@@ -439,29 +442,24 @@ class _HomState extends State<Hom> {
                               .vertical(
                             top:
                             Radius.circular(
-                                14),
+                              14,
+                            ),
                           ),
-                          child:
-                          image.isEmpty
+                          child: image.isEmpty
                               ? Center(
-                            child:
-                            Icon(
+                            child: Icon(
                               Icons
                                   .inventory_2_outlined,
-                              size:
-                              45,
+                              size: 45,
                               color: Colors
                                   .grey
                                   .shade400,
                             ),
                           )
-                              : Image
-                              .network(
+                              : Image.network(
                             image,
-                            fit: BoxFit
-                                .cover,
-                            errorBuilder:
-                                (
+                            fit: BoxFit.cover,
+                            errorBuilder: (
                                 context,
                                 error,
                                 stackTrace,
@@ -487,15 +485,18 @@ class _HomState extends State<Hom> {
                         top: 6,
                         right: 6,
                         child: CircleAvatar(
-                          radius: 15,
+                          radius: 20,
                           backgroundColor:
                           Colors.white
                               .withOpacity(
-                              0.9),
+                            0.95,
+                          ),
                           child: IconButton(
                             padding:
                             EdgeInsets.zero,
-                            iconSize: 18,
+                            constraints:
+                            BoxConstraints(),
+                            iconSize: 24,
                             onPressed:
                                 () async {
                               await provider
@@ -536,14 +537,15 @@ class _HomState extends State<Hom> {
                               borderRadius:
                               BorderRadius
                                   .circular(
-                                  6),
+                                6,
+                              ),
                             ),
                             child: Text(
                               "Unavailable",
                               style:
                               TextStyle(
-                                color: Colors
-                                    .white,
+                                color:
+                                Colors.white,
                                 fontSize: 9,
                                 fontWeight:
                                 FontWeight
@@ -557,7 +559,7 @@ class _HomState extends State<Hom> {
 
                   Padding(
                     padding:
-                    EdgeInsets.all(8),
+                    EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment:
                       CrossAxisAlignment
@@ -573,13 +575,12 @@ class _HomState extends State<Hom> {
                               .ellipsis,
                           style: TextStyle(
                             fontWeight:
-                            FontWeight
-                                .bold,
+                            FontWeight.bold,
                             fontSize: 13,
                           ),
                         ),
 
-                        SizedBox(height: 2),
+                        SizedBox(height: 3),
 
                         Text(
                           data['pcatogory']
@@ -603,16 +604,14 @@ class _HomState extends State<Hom> {
                           Text(
                             "Currently Unavailable",
                             style: TextStyle(
-                              color:
-                              Colors.red,
+                              color: Colors.red,
                               fontSize: 10,
                               fontWeight:
-                              FontWeight
-                                  .bold,
+                              FontWeight.bold,
                             ),
                           ),
 
-                        SizedBox(height: 4),
+                        SizedBox(height: 6),
 
                         Row(
                           children: [
@@ -637,8 +636,7 @@ class _HomState extends State<Hom> {
                             ),
 
                             InkWell(
-                              onTap:
-                              isAvailable
+                              onTap: isAvailable
                                   ? () async {
                                 await provider
                                     .addToCart(
@@ -650,20 +648,22 @@ class _HomState extends State<Hom> {
                               borderRadius:
                               BorderRadius
                                   .circular(
-                                  8),
+                                10,
+                              ),
                               child: Container(
                                 padding:
                                 EdgeInsets
                                     .symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
+                                  horizontal: 12,
+                                  vertical: 9,
                                 ),
                                 decoration:
                                 BoxDecoration(
                                   borderRadius:
                                   BorderRadius
                                       .circular(
-                                      8),
+                                    10,
+                                  ),
                                   color:
                                   isAvailable
                                       ? Colors
@@ -679,16 +679,16 @@ class _HomState extends State<Hom> {
                                     Icon(
                                       isAvailable
                                           ? Icons
-                                          .add
+                                          .add_shopping_cart
                                           : Icons
                                           .block,
-                                      size: 18,
+                                      size: 20,
                                       color: Colors
                                           .white,
                                     ),
                                     SizedBox(
-                                        width:
-                                        2),
+                                      width: 5,
+                                    ),
                                     Text(
                                       isAvailable
                                           ? "Add"
@@ -698,7 +698,7 @@ class _HomState extends State<Hom> {
                                         color: Colors
                                             .white,
                                         fontSize:
-                                        9,
+                                        12,
                                         fontWeight:
                                         FontWeight
                                             .bold,
